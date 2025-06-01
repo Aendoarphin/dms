@@ -1,15 +1,19 @@
-import express, { Request, Response, Application } from 'express';
+import express, { Request, Response, Application, Router } from 'express';
 import dotenv from 'dotenv';
+
+import userRouter from './app/routes/user';
+
+const routes: { user: Router }= {
+  user: userRouter,
+}
 
 dotenv.config();
 
 const app: Application = express();
-const port = process.env.PORT || 3000;
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('DMS API is running!');
-});
+app.use(express.json());
+app.use('/user', userRouter);
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running on http://${process.env.HOST}:${process.env.PORT}`);
 });
