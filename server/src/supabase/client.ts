@@ -1,6 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
 
-const supabase = createClient(
+dotenv.config();
+
+const sb = createClient(
 	process.env.SUPABASE_URL as string,
 	process.env.SUPABASE_SERVICE_ROLE_KEY as string,
 	{
@@ -11,6 +14,4 @@ const supabase = createClient(
 	}
 );
 
-const sbAdminAuthClient = supabase.auth.admin;
-
-export { sbAdminAuthClient };
+export { sb };
