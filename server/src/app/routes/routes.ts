@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { sb } from "../../supabase/client";
+import { UserResponse } from "@supabase/supabase-js";
 
 const userRouter = Router();
 
@@ -62,15 +63,41 @@ userRouter
   })
 
   // Update a user; PUT /user/:id
-  .put("/user/:id", (req, res) => {
+  .put("/user/:id", async (req, res) => {
     try {
-    } catch (error: any) {}
+      const { error } = await sb.auth.admin.updateUserById(
+        req.params.id,
+        req.body.data
+      );
+      if (error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(200).json({ message: "User updated successfully" });
+      }
+    } catch (error: any) {
+      {
+        res.status(400).json({ message: error.message });
+      }
+    }
   })
 
   // Delete a user; DELETE /user/:id
-  .delete("/user/:id", (req, res) => {
+  .delete("/user", async (req, res) => {
     try {
-    } catch (error: any) {}
+      const userId = req.body.id;
+      const { error } = await sb.auth.admin.deleteUser(userId);
+      if (error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res
+          .status(200)
+          .json({ message: `User ${req.body.id} deleted successfully` });
+      }
+    } catch (error: any) {
+      {
+        res.status(400).json({ message: error.message });
+      }
+    }
   });
 
 export { userRouter };
