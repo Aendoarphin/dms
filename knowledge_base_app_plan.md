@@ -54,4 +54,4 @@
 
 ## 🗂️ High-Level Architecture Diagram
 
-![High-Level Architecture Diagram](./dms-architecture.png)
+![High-Level Architecture Diagram](./high-level-model.png)
