@@ -48,7 +48,7 @@
 
 **Deployment:**
 - Frontend: Vercel
-- Backend: Node Express on Vercel
+- Backend: Supabase Edge Functions (Potentially Express in the future)
 
 ---
 
