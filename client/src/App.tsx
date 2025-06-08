@@ -8,6 +8,7 @@ import Profile from "./components/Profile";
 import NotFound from "./components/NotFound";
 import Admin from "./components/Admin";
 import Layout from "./layout";
+import Search from "./components/Search";
 
 function App() {
 	supabase.auth.onAuthStateChange((event, session) => {
@@ -37,6 +38,7 @@ function App() {
 					<Route path="/" element={<Home />} />
 					<Route path="/articles" element={<Articles />} />
 					<Route path="/profile" element={<Profile />} />
+					<Route path="/search" element={<Search />} />
 					<Route path="*" element={<NotFound />} />
 					{
 						// Analyze user_metadata.user_role for protected routes
