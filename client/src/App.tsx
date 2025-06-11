@@ -11,14 +11,22 @@ import Layout from "./layout";
 import Search from "./components/Search";
 import Login from "./components/Login";
 
-import { UserContext } from "./context/context";
-
-import { useContext, useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
+import { AuthEventContext } from "./context/AuthEventContext";
+import { AdminContext } from "./context/AdminContext";
+import { UserContext } from "./context/UserContext";
+import type {
+  AuthChangeEvent,
+  PostgrestSingleResponse,
+  User,
+} from "@supabase/supabase-js";
 
 function App() {
-  const [user, setUser] = useState<User | null>(useContext(UserContext));
-  const [admins, setAdmins] = useState<User[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [admins, setAdmins] = useState<any[] | null>([]);
+  const [authEvent, setAuthEvent] = useState<AuthChangeEvent | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,18 +37,24 @@ function App() {
     };
     fetchUser();
     const fetchAdmins = async () => {
-      const { data: users }: any = await supabase
+      const { data: users }: PostgrestSingleResponse<any[]> = await supabase
         .from("administrators")
         .select("*");
       setAdmins(users);
     };
     fetchAdmins();
+    console.log(admins);
+
+    if (!user) {
+      navigate("/login");
+    }
   }, [user]);
 
   supabase.auth.onAuthStateChange((event, session) => {
     if (session) {
       setUser(session.user);
     }
+    setAuthEvent(event);
     if (event === "INITIAL_SESSION") {
       // handle initial session
     } else if (event === "SIGNED_IN") {
@@ -61,35 +75,35 @@ function App() {
   // call unsubscribe to remove the callback
   // data.subscription.unsubscribe()
 
-  if (user) {
-		return (
+  return (
     <>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/articles" element={<Articles />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="*" element={<NotFound />} />
-          {
-            // Analyze administrators table for rendering protected routes
-            admins.find((admin) => admin.id === user!.id) ? (
-              <Route path="/admin" element={<Admin />} />
-            ) : null
-          }
-        </Route>
-      </Routes>
+      <UserContext.Provider value={user}>
+        <AdminContext.Provider value={admins}>
+        <AuthEventContext.Provider value={authEvent}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/articles" element={<Articles />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="*" element={<NotFound />} />
+              {
+                // Analyze administrators table for rendering protected routes
+                admins &&
+                admins.find(
+                  (admin) => admin.user_id === (user ? user.id : null)
+                ) ? (
+                  <Route path="/admin" element={<Admin />} />
+                ) : null
+              }
+            </Route>
+          </Routes>
+        </AuthEventContext.Provider>
+      </AdminContext.Provider>
+      </UserContext.Provider>
     </>
   );
-	} else {
-		return (
-			<>
-				<Routes>
-					<Route path="/login" element={<Login />} />
-				</Routes>
-			</>
-		);
-	}
 }
 
 export default App;

@@ -1,4 +1,4 @@
-import { User, Home, BookOpen, Search, Shield } from "lucide-react";
+import { User as UserIcon, Home, BookOpen, Search, Shield, LogOut } from "lucide-react";
 
 import {
 	Sidebar,
@@ -10,6 +10,9 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useContext, useState } from "react";
+import { UserContext } from "@/context/UserContext";
+import { AdminContext } from "@/context/AdminContext";
 
 // Menu items.
 const items = [
@@ -32,16 +35,24 @@ const items = [
 	{
 		title: "User Profile",
 		url: "profile",
-		icon: User,
+		icon: UserIcon,
 	},
 	{
 		title: "Admin",
 		url: "admin",
 		icon: Shield,
 	},
+	{
+		title: "Logout",
+		url: "/",
+		icon: LogOut,
+	},
 ];
 
 export function AppSidebar() {
+	const [user] = useState(useContext(UserContext));
+	const [admins] = useState(useContext(AdminContext));
+
 	return (
 		<Sidebar>
 			<SidebarContent>
@@ -51,7 +62,7 @@ export function AppSidebar() {
 						<SidebarMenu>
 							{items.map((item) => (
 								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild>
+									<SidebarMenuButton asChild className={""}>
 										<a href={item.url}>
 											<item.icon />
 											<span>{item.title}</span>
@@ -66,3 +77,5 @@ export function AppSidebar() {
 		</Sidebar>
 	);
 }
+
+// continue here; add logout function
