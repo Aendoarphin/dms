@@ -47,7 +47,6 @@ export function Login() {
   return (
     <>
       <Toaster duration={5000} position="top-center"/>
-      <form onSubmit={handleLogin}>
         <Card className="mx-auto mt-[25vh] max-w-xs container">
           <CardHeader>
             <CardTitle className="text-center text-2xl">
@@ -65,7 +64,7 @@ export function Login() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form>
+            <form onSubmit={handleLogin}>
               <div className="flex flex-col gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
@@ -108,7 +107,6 @@ export function Login() {
             </Button>
           </CardFooter>
         </Card>
-      </form>
     </>
   );
 }

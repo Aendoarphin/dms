@@ -28,29 +28,37 @@ function App() {
 
   const navigate = useNavigate();
 
+  // Effect to fetch user
+useEffect(() => {
+  const fetchUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    setUser(user);
+  };
+  fetchUser();
+}, []);
+
+// Effect to fetch admins
+useEffect(() => {
+  const fetchAdmins = async () => {
+    const { data: users }: PostgrestSingleResponse<any[]> = await supabase
+      .from("administrators")
+      .select("*");
+    setAdmins(users);
+  };
+  fetchAdmins();
+}, []);
+
+// Effect to handle navigation
+useEffect(() => {
+  if (!user) {
+    navigate("/login");
+  }
+}, []);
+
   useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    fetchUser();
-    const fetchAdmins = async () => {
-      const { data: users }: PostgrestSingleResponse<any[]> = await supabase
-        .from("administrators")
-        .select("*");
-      setAdmins(users);
-    };
-    fetchAdmins();
-    console.log(admins);
-
-    if (!user) {
-      navigate("/login");
-    }
-  }, [user]);
-
-  supabase.auth.onAuthStateChange((event, session) => {
+    const {data: subscription} = supabase.auth.onAuthStateChange((event, session) => {
     if (session) {
       setUser(session.user);
     }
@@ -59,10 +67,12 @@ function App() {
       // handle initial session
     } else if (event === "SIGNED_IN") {
       // handle sign in event
-      setUser(session!.user);
+      if (session) setUser(session.user)
+      console.log("Signed in");
     } else if (event === "SIGNED_OUT") {
       // handle sign out event
       setUser(null);
+      console.log("Signed out");
     } else if (event === "PASSWORD_RECOVERY") {
       // handle password recovery event
     } else if (event === "TOKEN_REFRESHED") {
@@ -73,7 +83,12 @@ function App() {
   });
 
   // call unsubscribe to remove the callback
-  // data.subscription.unsubscribe()
+  
+    return () => {
+        subscription.subscription.unsubscribe();
+    }
+  }, [])
+  
 
   return (
     <>

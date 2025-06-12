@@ -13,6 +13,8 @@ import {
 import { useContext, useState } from "react";
 import { UserContext } from "@/context/UserContext";
 import { AdminContext } from "@/context/AdminContext";
+import supabase from "@/util/supabase";
+import { AuthEventContext } from "@/context/AuthEventContext";
 
 // Menu items.
 const items = [
@@ -52,6 +54,11 @@ const items = [
 export function AppSidebar() {
 	const [user] = useState(useContext(UserContext));
 	const [admins] = useState(useContext(AdminContext));
+	const [authEvent] = useState(useContext(AuthEventContext));
+
+	const handleLogout = () => {
+		supabase.auth.signOut({ scope: "global"})
+	}
 
 	return (
 		<Sidebar>
@@ -63,11 +70,11 @@ export function AppSidebar() {
 							{items.map((item) => (
 								<SidebarMenuItem key={item.title}>
 									<SidebarMenuButton asChild className={""}>
-										<a href={item.url}>
-											<item.icon />
-											<span>{item.title}</span>
-										</a>
-									</SidebarMenuButton>
+											<a href={item.url} onClick={() => item.title === "Logout" ? handleLogout() : null}>
+												<item.icon />
+												<span>{item.title}</span>
+											</a>
+										</SidebarMenuButton>
 								</SidebarMenuItem>
 							))}
 						</SidebarMenu>
