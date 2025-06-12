@@ -102,7 +102,7 @@ export function Login() {
             </form>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
+            <Button onClick={handleLogin} type="submit" className="w-full cursor-pointer">
               Login
             </Button>
           </CardFooter>
