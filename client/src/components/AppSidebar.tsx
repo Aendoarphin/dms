@@ -59,10 +59,17 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-		console.log(error);
-    localStorage.clear();
-    navigate("/login"); // continue here
+    await supabase.auth.signOut();
+		[
+      window.localStorage,
+      window.sessionStorage,
+    ].forEach((storage) => {
+      Object.entries(storage)
+        .forEach(([key]) => {
+          storage.removeItem(key)
+        })
+    })
+		navigate("/login");
   };
 
   return (
