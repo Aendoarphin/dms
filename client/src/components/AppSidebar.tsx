@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import supabase from "@/util/supabase";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 
 // Menu items.
 const items = [
@@ -59,7 +59,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({scope: "global"});
 		[
       window.localStorage,
       window.sessionStorage,
@@ -70,6 +70,7 @@ export function AppSidebar() {
         })
     })
 		navigate("/login");
+    window.location.replace("/login"); // continue here; last action was clearing the browser history
   };
 
   return (
@@ -82,15 +83,15 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className={""}>
-                    <a
-                      href={item.url}
+                    <Link
+                      to={item.url}
                       onClick={() =>
                         item.title === "Logout" ? handleLogout() : null
                       }
                     >
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

@@ -18,10 +18,17 @@ const SessionContext = createContext<Session | null>(null);
 
 function App() {
   const navigate = useNavigate();
-
   const [session, setSession] = useState<Session | null>(null);
 
+  // if (session === null && window.location.pathname !== "/login") {
+  //   navigate("/login");
+  // }
+
   useEffect(() => {
+    if (session === null && window.location.pathname !== "/login") {
+    navigate("/login");
+    window.location.replace("/login");
+  }
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -44,18 +51,18 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           {session !== null && (
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="articles" element={<Articles />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="search" element={<Search />} />
-              <Route path="admin" element={<Admin />} />
-            </Route>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="articles" element={<Articles />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="search" element={<Search />} />
+                <Route path="admin" element={<Admin />} />
+              </Route>
           )}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </SessionContext.Provider>
-    </> //continue here
+    </>
   );
 }
 
