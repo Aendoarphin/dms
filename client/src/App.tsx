@@ -14,56 +14,62 @@ import { useEffect, useState, createContext } from "react";
 import { type Session } from "@supabase/supabase-js";
 import NotFound from "./components/NotFound";
 
-const SessionContext = createContext<Session | null>(null);
+export const SessionContext = createContext<Session | null>(null);
 
 function App() {
-  const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
+	const navigate = useNavigate();
+	const [session, setSession] = useState<Session | null>(null);
 
-  // if (session === null && window.location.pathname !== "/login") {
-  //   navigate("/login");
-  // }
+	useEffect(() => {
+		// 1. Check for existing session on initial load
+		const getInitialSession = async () => {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			if (session) {
+				setSession(session);
+			} else if (window.location.pathname !== "/login") {
+				navigate("/login", { replace: true });
+			}
+		};
 
-  useEffect(() => {
-    if (session === null && window.location.pathname !== "/login") {
-    navigate("/login");
-    window.location.replace("/login");
-  }
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log({ event, session });
-      if (event === "SIGNED_OUT") {
-        setSession(null);
-      } else if (session) {
-        setSession(session);
-      }
-    });
+		getInitialSession();
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+		// 2. Listen for future auth state changes
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange((event, session) => {
+			console.log({ event, session });
+			if (event === "SIGNED_OUT") {
+				setSession(null);
+			} else if (session) {
+				setSession(session);
+			}
+		});
 
-  return (
-    <>
-      <SessionContext.Provider value={session}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          {session !== null && (
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="articles" element={<Articles />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="search" element={<Search />} />
-                <Route path="admin" element={<Admin />} />
-              </Route>
-          )}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </SessionContext.Provider>
-    </>
-  );
+		return () => {
+			subscription.unsubscribe();
+		};
+	}, [navigate]);
+	return (
+		<>
+			<SessionContext.Provider value={session}>
+				<Routes>
+					<Route path="/login" element={<Login />} />
+					{session !== null && (
+						<Route path="/" element={<Layout />}>
+							<Route index element={<Home />} />
+							<Route path="articles" element={<Articles />} />
+							<Route path="profile" element={<Profile />} />
+							<Route path="search" element={<Search />} />
+							<Route path="admin" element={<Admin />} />
+						</Route>
+					)}
+					<Route path="*" element={<NotFound />} />
+				</Routes>
+			</SessionContext.Provider>
+		</>
+	);
 }
 
 export default App;

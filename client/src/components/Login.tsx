@@ -40,9 +40,6 @@ export function Login() {
       (document.getElementById("email") as HTMLInputElement).value = "";
       (document.getElementById("password") as HTMLInputElement).value = "";
     } else {
-      console.log("History before clearing: ", window.history.length);
-      window.history.replaceState(null, "", window.location.href);
-      console.log("History after clearing: ", window.history.length);
       navigate("/");
     }
   };
