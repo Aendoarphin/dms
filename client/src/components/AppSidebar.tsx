@@ -5,6 +5,8 @@ import {
   Search,
   Shield,
   LogOut,
+  Pencil,
+  Database,
 } from "lucide-react";
 
 import {
@@ -52,14 +54,24 @@ const items = [
     icon: Search,
   },
   {
-    title: "User Profile",
+    title: "My Profile",
     url: "profile",
     icon: UserIcon,
   },
   {
-    title: "Admin",
-    url: "admin",
+    title: "Users",
+    url: "users",
     icon: Shield,
+  },
+  {
+    title: "Editor",
+    url: "editor",
+    icon: Pencil,
+  },
+  {
+    title: "Documents",
+    url: "documents",
+    icon: Database,
   },
   {
     title: "Logout",
@@ -67,6 +79,8 @@ const items = [
     icon: LogOut,
   },
 ];
+
+const adminItems = [ "Users", "Editor", "Documents" ]
 
 export function AppSidebar() {
   const navigate = useNavigate();
@@ -103,26 +117,25 @@ export function AppSidebar() {
   }, []);
 
   return (
-    <>
-      <Sidebar className="max-w-min">
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-nowrap">
-              Logo Company Name
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {items.map((item) => (
+    <Sidebar className="max-w-min">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-nowrap">
+            Logo Company Name
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((item) => {
+                if (
+                  adminItems.includes(item.title) &&
+                  currentSession?.user.id !== admin
+                ) {
+                  return null;
+                }
+
+                return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      className={
-                        item.title === "Admin" &&
-                        currentSession?.user.id !== admin
-                          ? "hidden"
-                          : ""
-                      }
-                    >
+                    <SidebarMenuButton asChild>
                       {item.title === "Logout" ? (
                         <Dialog modal>
                           <DialogTrigger asChild>
@@ -140,10 +153,10 @@ export function AppSidebar() {
                               </DialogDescription>
                             </DialogHeader>
                             <Button
-                              variant={"destructive"}
+                              variant="destructive"
                               onClick={handleLogout}
                               type="button"
-															className="cursor-pointer" // continue here
+                              className="cursor-pointer"
                             >
                               Logout
                             </Button>
@@ -154,18 +167,18 @@ export function AppSidebar() {
                           to={item.url}
                           className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md"
                         >
-                          <item.icon />
+                          <item.icon size={16} />
                           <span>{item.title}</span>
                         </Link>
                       )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
-    </>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
   );
 }

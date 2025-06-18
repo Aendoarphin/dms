@@ -5,7 +5,7 @@ import supabase from "./util/supabase";
 import Articles from "./components/Articles";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
-import Admin from "./components/Admin";
+import Users from "./components/Users";
 import Layout from "./layout";
 import Search from "./components/Search";
 import Login from "./components/Login";
@@ -13,6 +13,8 @@ import Login from "./components/Login";
 import { useEffect, useState, createContext } from "react";
 import { type Session } from "@supabase/supabase-js";
 import NotFound from "./components/NotFound";
+import Editor from "./components/Editor";
+import Documents from "./components/Documents";
 
 export const SessionContext = createContext<Session | null>(null);
 
@@ -62,7 +64,9 @@ function App() {
 							<Route path="articles" element={<Articles />} />
 							<Route path="profile" element={<Profile />} />
 							<Route path="search" element={<Search />} />
-							<Route path="admin" element={<Admin />} />
+							<Route path="users" element={<Users />} />
+							<Route path="editor" element={<Editor />} />
+							<Route path="documents" element={<Documents />} />
 						</Route>
 					)}
 					<Route path="*" element={<NotFound />} />
