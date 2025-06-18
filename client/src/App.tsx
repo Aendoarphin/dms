@@ -15,6 +15,7 @@ import { type Session } from "@supabase/supabase-js";
 import NotFound from "./components/NotFound";
 import Editor from "./components/Editor";
 import Documents from "./components/Documents";
+import useListenAuth from "./hooks/useListenAuth";
 
 export const SessionContext = createContext<Session | null>(null);
 
@@ -53,6 +54,10 @@ function App() {
 			subscription.unsubscribe();
 		};
 	}, [navigate]);
+
+	useListenAuth(session?.user?.last_sign_in_at ?? "");
+
+
 	return (
 		<>
 			<SessionContext.Provider value={session}>
