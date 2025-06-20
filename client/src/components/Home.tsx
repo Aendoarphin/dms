@@ -144,7 +144,7 @@ export default function Home() {
     <div className="flex min-h-screen bg-background">
       {/* Main Content */}
       <div className="flex-1 p-6 md:p-8">
-        <div className="flex flex-col space-y-6 max-w-7xl mx-auto">
+        <div className="flex flex-col space-y-6 mx-auto">
           {/* Header */}
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>

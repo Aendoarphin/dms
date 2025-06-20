@@ -201,9 +201,9 @@ export default function Articles() {
           {/* Header */}
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold">Knowledge Base Articles</h1>
+              <h1 className="text-2xl font-bold">Knowledge Base Articles</h1>
               <p className="text-muted-foreground">
-                Browse all published articles and resources
+                Browse all published articles
               </p>
             </div>
             <div className="flex items-center space-x-2">
@@ -235,7 +235,7 @@ export default function Articles() {
           </div>
 
           {/* Filter Bar */}
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted/40 rounded-lg">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
             <div className="flex flex-wrap gap-2">
               {categories.map((category, index) => (
                 <Button
@@ -297,7 +297,7 @@ export default function Articles() {
                       {article.category}
                     </Badge>
                   </div>
-                  <CardTitle className="line-clamp-2 hover:text-primary transition-colors">
+                  <CardTitle className="line-clamp-2">
                     {article.title}
                   </CardTitle>
                   <CardDescription className="line-clamp-3">

@@ -22,9 +22,10 @@ const useListenAuth = (signedInTime: string) => {
       const currentTime = new Date().getTime();
       const signedInTimestamp = new Date(signedInTime).getTime();
       const timeDiff = (currentTime - signedInTimestamp) / 1000 / 60;
-      if (timeDiff > 1) {
+      if (timeDiff > 120) { // minutes
         supabase.auth.signOut();
         localStorage.clear();
+        window.alert('Your session has expired. Please log in again.');
         navigate('/login', { replace: true });
       }
     }

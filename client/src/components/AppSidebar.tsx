@@ -2,7 +2,6 @@ import {
   User as UserIcon,
   Home,
   BookOpen,
-  Search,
   Shield,
   LogOut,
   Pencil,
@@ -47,12 +46,6 @@ const items = [
     url: "articles",
     icon: BookOpen,
   },
-
-  {
-    title: "Search",
-    url: "search",
-    icon: Search,
-  },
   {
     title: "My Profile",
     url: "profile",
@@ -69,18 +62,13 @@ const items = [
     icon: Pencil,
   },
   {
-    title: "Documents",
-    url: "documents",
-    icon: Database,
-  },
-  {
     title: "Logout",
     url: "/login",
     icon: LogOut,
   },
 ];
 
-const adminItems = [ "Users", "Editor", "Documents" ]
+const adminItems = [ "Users", "Editor" ]
 
 export function AppSidebar() {
   const navigate = useNavigate();
