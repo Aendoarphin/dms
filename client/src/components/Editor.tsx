@@ -44,7 +44,7 @@ export default function Editor() {
           </div>
 
           {/* Article Status Bar */}
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
+          <div hidden className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
             <div className="flex flex-wrap gap-2 items-center">
               <Badge variant={isPublished ? "default" : "secondary"}>{isPublished ? "Published" : "Draft"}</Badge>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
