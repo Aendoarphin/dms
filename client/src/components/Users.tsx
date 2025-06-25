@@ -1,5 +1,4 @@
 import { Search, UsersIcon, Calendar, Mail } from "lucide-react";
-import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,58 +24,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect, useState } from "react";
-import supabase from "@/util/supabase";
-import type { User } from "@supabase/supabase-js";
+import { useUsers } from "@/hooks/useUsers";
+import { useAdmins } from "@/hooks/useAdmins";
+import Loading from "@/components/Loading";
 
 export default function Users() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [admins, setAdmins] = useState<any[] | null>([]);
-
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get(
-        "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
-
-  const fetchAdmins = async () => {
-    const { data, error } = await supabase.from("administrators").select("*");
-    if (error) {
-      console.error("Error fetching admins:", error);
-      return [];
-    }
-    // console.log(data);
-    return data;
-  };
-
-  const fetchData = async () => {
-    const users = await fetchUsers();
-    const admins = await fetchAdmins();
-    setUsers(users);
-    setAdmins(admins);
-
-    console.log(admins);
-    console.log(users);
-  };
+  const { users, loading: usersLoading, error: usersError } = useUsers();
+  const { admins, loading: adminsLoading, error: adminsError } = useAdmins();
 
   const isAdmin = (userId: string) => {
     return admins?.some((admin) => admin.user_id === userId);
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const allUsers = [
     ...users.map((user) => ({
@@ -105,6 +63,25 @@ export default function Users() {
       minute: "2-digit",
     });
   };
+
+  // Loading state
+  if (usersLoading || adminsLoading) {
+    return <Loading />;
+  }
+
+  // Error state
+  if (usersError || adminsError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">
+            Error: {usersError || adminsError}
+          </p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,13 +121,13 @@ export default function Users() {
               <Button variant="outline" size="sm" className="h-8">
                 Admins
                 <Badge variant="secondary" className="ml-2">
-                  {allUsers.filter((u) => u.role === "admin").length}
+                  {allUsers.filter((u) => u.role === "Admin").length}
                 </Badge>
               </Button>
               <Button variant="outline" size="sm" className="h-8">
                 Users
                 <Badge variant="secondary" className="ml-2">
-                  {allUsers.filter((u) => u.role === "user").length}
+                  {allUsers.filter((u) => u.role === "User").length}
                 </Badge>
               </Button>
             </div>
