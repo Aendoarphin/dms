@@ -1,4 +1,4 @@
-import { Search, UsersIcon, Calendar, Mail } from "lucide-react";
+import { Search, UsersIcon, Calendar, Mail, CircleUser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,6 +39,7 @@ export default function Users() {
   const allUsers = [
     ...users.map((user) => ({
       id: user.id,
+      name: user.user_metadata.firstName + " " + user.user_metadata.lastName,
       email: user.email,
       created: user.created_at,
       lastSignIn: user.last_sign_in_at,
@@ -170,6 +171,12 @@ export default function Users() {
                   <TableRow>
                     <TableHead className="w-[300px]">
                       <div className="flex items-center space-x-2">
+                        <CircleUser className="h-4 w-4" />
+                        <span>Name</span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="w-[300px]">
+                      <div className="flex items-center space-x-2">
                         <Mail className="h-4 w-4" />
                         <span>Email</span>
                       </div>
@@ -192,6 +199,7 @@ export default function Users() {
                 <TableBody>
                   {allUsers.map((user) => (
                     <TableRow key={user.id} className="hover:bg-muted">
+                      <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell className="font-medium">
                         {user.email}
                       </TableCell>

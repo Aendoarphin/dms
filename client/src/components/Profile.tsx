@@ -184,7 +184,9 @@ export default function Profile() {
                     disabled={
                       newPassword !== confirmPassword ||
                       newPassword === "" ||
-                      confirmPassword === ""
+                      confirmPassword === "" ||
+                      newPassword.includes(" ") ||
+                      confirmPassword.includes(" ")
                     }
                   >
                     Update Password
