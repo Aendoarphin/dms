@@ -27,6 +27,7 @@ import {
 import { useUsers } from "@/hooks/useUsers";
 import { useAdmins } from "@/hooks/useAdmins";
 import Loading from "@/components/Loading";
+import { Link } from "react-router";
 
 export default function Users() {
   const { users, loading: usersLoading, error: usersError } = useUsers();
@@ -106,7 +107,7 @@ export default function Users() {
                   className="w-full lg:w-[300px] pl-8"
                 />
               </div>
-              <Button>Add User</Button>
+              <Link to={"new"} className="cursor-pointer"><Button>Add User</Button></Link>
             </div>
           </div>
 
