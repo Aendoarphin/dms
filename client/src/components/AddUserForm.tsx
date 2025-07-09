@@ -18,6 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router";
+import { toast, Toaster } from "sonner";
+import axios, { type AxiosResponse } from "axios";
+import type { AuthError, User } from "@supabase/supabase-js";
 
 export default function AddUserForm() {
   const [formData, setFormData] = useState({
@@ -45,17 +48,57 @@ export default function AddUserForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const alertMessage = `New User Details:
-First Name: ${formData.firstName}
-Last Name: ${formData.lastName}
-Email: ${formData.email}
-Password: ${formData.password}
-Role: ${formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}`;
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
+    };
 
-    window.alert(alertMessage);
+    const formInput = {
+      email: formData.email,
+      email_confirm: true,
+      password: formData.password,
+      user_metadata: {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        role: formData.role,
+      },
+    };
+
+    // Create the user
+    try {
+      const response = await axios.post(
+        "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
+        formInput,
+        config
+      );
+
+      if (response.status !== 200) {
+        toast.error(response.data, {
+          style: { backgroundColor: "red", color: "white" },
+        });
+        setFormData({
+          firstName: "",
+          lastName: "", // continue here; work on adding the user and updating the metadata
+          email: "",
+          password: "",
+          role: "",
+        });
+      } else {
+        toast.error(response.data.message, {
+          style: { backgroundColor: "red", color: "white" },
+        });
+      }
+    } catch (error) {
+      // Handle any unexpected errors
+      toast.error("An unexpected error occurred", {
+        style: { backgroundColor: "red", color: "white" },
+      });
+    }
   };
 
   const handleBack = () => {
@@ -64,6 +107,7 @@ Role: ${formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}`;
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster duration={5000} position="top-right" />
       <div className="p-6 lg:p-8">
         <div className="flex flex-col space-y-6 max-w-2xl mx-auto">
           {/* Header */}
@@ -74,9 +118,9 @@ Role: ${formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}`;
                   variant="ghost"
                   size="sm"
                   onClick={handleBack}
-                  className="p-0 h-auto"
+                  className="p-2 h-auto"
                 >
-                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  <ArrowLeft className="h-4 w-4" />
                   Back
                 </Button>
               </div>
@@ -172,7 +216,7 @@ Role: ${formData.role.charAt(0).toUpperCase() + formData.role.slice(1)}`;
 
                 <div className="flex items-center justify-between pt-4">
                   <Button type="button" variant="outline" onClick={handleBack}>
-                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    <ArrowLeft className="h-4 w-4" />
                     Cancel
                   </Button>
                   <Button type="submit">

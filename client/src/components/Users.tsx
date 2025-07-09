@@ -57,12 +57,14 @@ export default function Users() {
   };
 
   const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    if (!dateString) return null;
+    return new Date(dateString).toLocaleString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
     });
   };
 

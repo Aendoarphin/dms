@@ -23,7 +23,7 @@ export default function NotFound() {
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button asChild>
-            <Link to="/login">Go Home</Link>
+            <Link to="/">Go Home</Link>
           </Button>
         </CardFooter>
       </Card>
