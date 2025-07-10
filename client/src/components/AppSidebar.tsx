@@ -5,7 +5,6 @@ import {
   Shield,
   LogOut,
   Pencil,
-  Database,
 } from "lucide-react";
 
 import {
@@ -30,8 +29,7 @@ import {
 import supabase from "@/util/supabase";
 import { useNavigate, Link } from "react-router";
 
-import { useEffect, useContext, useState } from "react";
-import { SessionContext } from "@/App";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 
 // Menu items.
@@ -68,13 +66,15 @@ const items = [
   },
 ];
 
-const adminItems = [ "Users", "Editor" ]
+const adminItems = ["Users", "Editor"];
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const currentSession = useContext(SessionContext);
 
   const [admin, setAdmin] = useState<string | null>(null);
+  const [currentUser] = useState(
+    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut({ scope: "global" });
@@ -87,7 +87,7 @@ export function AppSidebar() {
   };
 
   useEffect(() => {
-    const getAdmins = async () => {
+    const getAdmin = async () => {
       const { data, error } = await supabase.from("administrators").select("*");
 
       if (error) {
@@ -95,14 +95,13 @@ export function AppSidebar() {
         return [];
       }
 
-      return data.find((admin) => admin.user_id === currentSession?.user.id)
-        ? data[0].user_id
-        : [];
+      setAdmin(
+        data.find((admin) => admin.user_id === currentUser.user.id).user_id
+      );
     };
-    getAdmins().then((targetAdmin) => {
-      setAdmin(targetAdmin);
-    });
-  }, []);
+
+    getAdmin();
+  }, [navigate, admin]);
 
   return (
     <Sidebar className="max-w-min">
@@ -116,7 +115,7 @@ export function AppSidebar() {
               {items.map((item) => {
                 if (
                   adminItems.includes(item.title) &&
-                  currentSession?.user.id !== admin
+                  currentUser.user.id !== admin
                 ) {
                   return null;
                 }

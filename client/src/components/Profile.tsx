@@ -25,7 +25,10 @@ export default function Profile() {
   );
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [emailConfirmationDAte] = useState<string | null>(
+    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "").user
+      .email_confirmed_at
+  );
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +50,8 @@ export default function Profile() {
     setConfirmPassword("");
 
     (document.getElementById("new-password") as HTMLInputElement).value = "";
-    (document.getElementById("confirm-password") as HTMLInputElement).value = "";
+    (document.getElementById("confirm-password") as HTMLInputElement).value =
+      "";
   };
 
   return (
@@ -86,7 +90,17 @@ export default function Profile() {
                       {userEmail}
                     </p>
                   </div>
-                  <Badge variant="secondary">Verified</Badge>
+                  <Badge
+                    variant={
+                      emailConfirmationDAte === null
+                        ? "destructive"
+                        : "secondary"
+                    }
+                  >
+                    {emailConfirmationDAte === null
+                      ? "Not Verified"
+                      : "Verified"}
+                  </Badge>
                 </div>
               </div>
             </CardContent>
@@ -118,6 +132,11 @@ export default function Profile() {
                         placeholder="Enter your new password"
                         className="pr-10"
                         onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        minLength={8}
+                        pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+                        title="Password must at least 8 characters, contain at least one letter, one number, and one special character."
+                        autoComplete="new-password"
                       />
                       <Button
                         type="button"
@@ -152,6 +171,11 @@ export default function Profile() {
                         placeholder="Confirm your new password"
                         className="pr-10"
                         onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        minLength={8}
+                        pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+                        title="Password must at least 8 characters, contain at least one letter, one number, and one special character."
+                        autoComplete="confirm-password"
                       />
                       <Button
                         type="button"

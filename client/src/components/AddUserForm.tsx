@@ -20,8 +20,14 @@ import {
 import { useNavigate } from "react-router";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
+import Loading from "./Loading";
+import supabase from "@/util/supabase";
 
 export default function AddUserForm() {
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -30,19 +36,12 @@ export default function AddUserForm() {
     role: "",
   });
 
-  const navigate = useNavigate();
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
-    const emailField = document.getElementById("email") as HTMLInputElement;
-    const passwordField = document.getElementById("password") as HTMLInputElement;
-
-
   };
 
   const handleRoleChange = (value: string) => {
@@ -54,6 +53,8 @@ export default function AddUserForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setLoading(true);
 
     const config = {
       headers: {
@@ -80,7 +81,16 @@ export default function AddUserForm() {
         formInput,
         config
       );
+      // Inert into admin table if role is admin
+      if (formData.role.toLowerCase() === "admin") {
+        const insertRes = await supabase.from("administrators").insert({
+          user_id: createUserRes.data.user.id,
+          created_at: createUserRes.data.user.created_at,
+        });
+        console.log(insertRes);
+      }
 
+      // Set user metadata
       if (createUserRes.status === 201 && createUserRes.data.user) {
         const setUserMetadataRes = await axios.put(
           `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${createUserRes.data.user.id}`,
@@ -92,7 +102,7 @@ export default function AddUserForm() {
             },
           },
           config
-        )
+        );
 
         if (createUserRes.status === 201) {
           toast.success("User created successfully", {
@@ -102,8 +112,8 @@ export default function AddUserForm() {
 
         if (setUserMetadataRes.data.error) {
           toast.error(createUserRes.data.error, {
-          style: { backgroundColor: "red", color: "white" },
-        });
+            style: { backgroundColor: "red", color: "white" },
+          });
         }
 
         setFormData({
@@ -122,6 +132,8 @@ export default function AddUserForm() {
       toast.error("Email is already in use", {
         style: { backgroundColor: "red", color: "white" },
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -219,17 +231,14 @@ export default function AddUserForm() {
                     onChange={handleInputChange}
                     required
                     minLength={8}
-                    pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$" // validate passwords
+                    pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+                    title="Password must at least 8 characters, contain at least one letter, one number, and one special character."
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Select
-                    onValueChange={handleRoleChange}
-                    value={formData.role}
-                    required
-                  >
+                  <Select onValueChange={handleRoleChange} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a role" />
                     </SelectTrigger>
@@ -246,8 +255,18 @@ export default function AddUserForm() {
                     Cancel
                   </Button>
                   <Button type="submit">
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Create User
+                    {loading ? (
+                      <>
+                        <div className="animate-pulse animation-duration-1000">
+                          Submitting...
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Submit
+                      </>
+                    )}
                   </Button>
                 </div>
               </form>
