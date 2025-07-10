@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useNavigate } from "react-router";
 import { toast, Toaster } from "sonner";
-import axios, { type AxiosResponse } from "axios";
-import type { AuthError, User } from "@supabase/supabase-js";
+import axios from "axios";
 
 export default function AddUserForm() {
   const [formData, setFormData] = useState({
@@ -39,6 +38,11 @@ export default function AddUserForm() {
       ...prev,
       [name]: value,
     }));
+
+    const emailField = document.getElementById("email") as HTMLInputElement;
+    const passwordField = document.getElementById("password") as HTMLInputElement;
+
+
   };
 
   const handleRoleChange = (value: string) => {
@@ -71,31 +75,51 @@ export default function AddUserForm() {
 
     // Create the user
     try {
-      const response = await axios.post(
+      const createUserRes = await axios.post(
         "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
         formInput,
         config
       );
 
-      if (response.status !== 200) {
-        toast.error(response.data, {
+      if (createUserRes.status === 201 && createUserRes.data.user) {
+        const setUserMetadataRes = await axios.put(
+          `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${createUserRes.data.user.id}`,
+          {
+            user_metadata: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              role: formData.role,
+            },
+          },
+          config
+        )
+
+        if (createUserRes.status === 201) {
+          toast.success("User created successfully", {
+            style: { backgroundColor: "green", color: "white" },
+          });
+        }
+
+        if (setUserMetadataRes.data.error) {
+          toast.error(createUserRes.data.error, {
           style: { backgroundColor: "red", color: "white" },
         });
+        }
+
         setFormData({
           firstName: "",
-          lastName: "", // continue here; work on adding the user and updating the metadata
+          lastName: "",
           email: "",
           password: "",
           role: "",
         });
       } else {
-        toast.error(response.data.message, {
+        toast.error(createUserRes.data.error.code, {
           style: { backgroundColor: "red", color: "white" },
         });
       }
     } catch (error) {
-      // Handle any unexpected errors
-      toast.error("An unexpected error occurred", {
+      toast.error("Email is already in use", {
         style: { backgroundColor: "red", color: "white" },
       });
     }
@@ -194,6 +218,8 @@ export default function AddUserForm() {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
+                    minLength={8}
+                    pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$" // validate passwords
                   />
                 </div>
 
