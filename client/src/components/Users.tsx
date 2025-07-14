@@ -1,4 +1,12 @@
-import { Search, UsersIcon, Calendar, Mail, CircleUser } from "lucide-react";
+import {
+  Search,
+  UsersIcon,
+  Calendar,
+  Mail,
+  CircleUser,
+  Pencil,
+  Trash,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,12 +37,41 @@ import { useAdmins } from "@/hooks/useAdmins";
 import Loading from "@/components/Loading";
 import { Link } from "react-router";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import axios from "axios";
+import { useState } from "react";
+
 export default function Users() {
   const { users, loading: usersLoading, error: usersError } = useUsers();
   const { admins, loading: adminsLoading, error: adminsError } = useAdmins();
+  const [currentUser] = useState(
+    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
+  );
 
   const isAdmin = (userId: string) => {
     return admins?.some((admin) => admin.user_id === userId);
+  };
+
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    const response = await axios.delete(
+      "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
+      { data: { id: userId }, headers }
+    );
+    if (response.status === 200) {
+      window.location.reload();
+    }
   };
 
   const allUsers = [
@@ -109,7 +146,9 @@ export default function Users() {
                   className="w-full lg:w-[300px] pl-8"
                 />
               </div>
-              <Link to={"new"} className="cursor-pointer"><Button>Add User</Button></Link>
+              <Link to={"new"} className="cursor-pointer">
+                <Button>Add User</Button>
+              </Link>
             </div>
           </div>
 
@@ -197,6 +236,7 @@ export default function Users() {
                       </div>
                     </TableHead>
                     <TableHead>Role</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -217,6 +257,50 @@ export default function Users() {
                           {user.role.charAt(0).toUpperCase() +
                             user.role.slice(1)}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="flex justify-center">
+                        <Button
+                          variant={"link"}
+                          onClick={() => {}}
+                          className={"p-0 cursor-pointer"}
+                        >
+                          <Pencil strokeWidth={3} fontSize={14} />
+                        </Button>
+                        <Button
+                          variant={"link"}
+                          onClick={() => {}}
+                          className={`p-0 cursor-pointer ${
+                            user.id === currentUser.user.id ? "hidden" : ""
+                          }`}
+                        >
+                          <Dialog modal>
+                            <DialogTrigger asChild>
+                              <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
+                                <Trash
+                                  strokeWidth={3}
+                                  fontSize={14}
+                                  color="red"
+                                />
+                              </div>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Confirm User Delete</DialogTitle>
+                                <DialogDescription>
+                                  Do you wish to delete user {user.email}?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <Button
+                                variant="destructive"
+                                onClick={() => handleDeleteUser(user.id)}
+                                type="button"
+                                className="cursor-pointer"
+                              >
+                                Delete
+                              </Button>
+                            </DialogContent>
+                          </Dialog>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

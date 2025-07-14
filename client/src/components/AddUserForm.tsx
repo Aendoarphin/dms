@@ -20,7 +20,6 @@ import {
 import { useNavigate } from "react-router";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
-import Loading from "./Loading";
 import supabase from "@/util/supabase";
 
 export default function AddUserForm() {
