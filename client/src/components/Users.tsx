@@ -54,6 +54,7 @@ export default function Users() {
   const [currentUser] = useState(
     JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
   );
+  const [loading, setLoading] = useState(false);
 
   const isAdmin = (userId: string) => {
     return admins?.some((admin) => admin.user_id === userId);
@@ -65,6 +66,7 @@ export default function Users() {
   };
 
   const handleDeleteUser = async (userId: string) => {
+    setLoading(true);
     const response = await axios.delete(
       "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
       { data: { id: userId }, headers }
@@ -72,6 +74,7 @@ export default function Users() {
     if (response.status === 200) {
       window.location.reload();
     }
+    setLoading(false);
   };
 
   const allUsers = [
@@ -263,6 +266,7 @@ export default function Users() {
                           variant={"link"}
                           onClick={() => {}}
                           className={"p-0 cursor-pointer"}
+                          title="Edit User"
                         >
                           <Pencil strokeWidth={3} fontSize={14} />
                         </Button>
@@ -272,6 +276,7 @@ export default function Users() {
                           className={`p-0 cursor-pointer ${
                             user.id === currentUser.user.id ? "hidden" : ""
                           }`}
+                          title="Delete User"
                         >
                           <Dialog modal>
                             <DialogTrigger asChild>
@@ -296,7 +301,7 @@ export default function Users() {
                                 type="button"
                                 className="cursor-pointer"
                               >
-                                Delete
+                                {loading ? <div className="animate-pulse">Deleting User...</div> : "Delete User"}
                               </Button>
                             </DialogContent>
                           </Dialog>
@@ -327,6 +332,7 @@ export default function Users() {
               Next
             </Button>
           </div>
+          
         </div>
       </div>
     </div>
