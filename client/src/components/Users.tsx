@@ -1,41 +1,13 @@
-import {
-  Search,
-  UsersIcon,
-  Calendar,
-  Mail,
-  CircleUser,
-  Pencil,
-  Trash,
-} from "lucide-react";
+import { Search, UsersIcon, Calendar, Mail, CircleUser, Pencil, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUsers } from "@/hooks/useUsers";
 import { useAdmins } from "@/hooks/useAdmins";
-import Loading from "@/components/Loading";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import {
   Dialog,
@@ -49,11 +21,11 @@ import axios from "axios";
 import { useState } from "react";
 
 export default function Users() {
+  const navigate = useNavigate();
+
   const { users, loading: usersLoading, error: usersError } = useUsers();
   const { admins, loading: adminsLoading, error: adminsError } = useAdmins();
-  const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
-  );
+  const [currentUser] = useState(JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || ""));
   const [loading, setLoading] = useState(false);
 
   const isAdmin = (userId: string) => {
@@ -67,10 +39,10 @@ export default function Users() {
 
   const handleDeleteUser = async (userId: string) => {
     setLoading(true);
-    const response = await axios.delete(
-      "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
-      { data: { id: userId }, headers }
-    );
+    const response = await axios.delete("https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user", {
+      data: { id: userId },
+      headers,
+    });
     if (response.status === 200) {
       window.location.reload();
     }
@@ -108,24 +80,26 @@ export default function Users() {
     });
   };
 
-  // Loading state
-  if (usersLoading || adminsLoading) {
-    return <Loading />;
-  }
-
   // Error state
   if (usersError || adminsError) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-destructive mb-4">
-            Error: {usersError || adminsError}
-          </p>
+          <p className="text-destructive mb-4">Error: {usersError || adminsError}</p>
           <Button onClick={() => window.location.reload()}>Retry</Button>
         </div>
       </div>
     );
   }
+
+  const handleEditUser = (first: string, last: string, email: string, role: string, id: string) => {
+    navigate({
+      pathname: "edit",
+      search: `?first=${encodeURIComponent(first)}&last=${encodeURIComponent(last)}&email=${encodeURIComponent(
+        email
+      )}&role=${encodeURIComponent(role)}&id=${encodeURIComponent(id)}`,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -136,18 +110,12 @@ export default function Users() {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <h1 className="text-2xl font-bold">Users</h1>
-              <p className="text-muted-foreground">
-                Manage all users in the system
-              </p>
+              <p className="text-muted-foreground">Manage all users in the system</p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search users..."
-                  className="w-full lg:w-[300px] pl-8"
-                />
+                <Input type="search" placeholder="Search users..." className="w-full lg:w-[300px] pl-8" />
               </div>
               <Link to={"new"} className="cursor-pointer">
                 <Button>Add User</Button>
@@ -194,9 +162,7 @@ export default function Users() {
 
           {/* Results Summary */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Showing {allUsers.length} users
-            </p>
+            <p className="text-sm text-muted-foreground">Showing {allUsers.length} users</p>
           </div>
 
           {/* Users Table */}
@@ -206,9 +172,7 @@ export default function Users() {
                 <UsersIcon className="h-5 w-5" />
                 <CardTitle>System Users</CardTitle>
               </div>
-              <CardDescription>
-                Complete list of all registered users
-              </CardDescription>
+              <CardDescription>Complete list of all registered users</CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -242,74 +206,65 @@ export default function Users() {
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
-                  {allUsers.map((user) => (
-                    <TableRow key={user.id} className="hover:bg-muted">
-                      <TableCell className="font-medium">{user.name}</TableCell>
-                      <TableCell className="font-medium">
-                        {user.email}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDate(user.created)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDateTime(user.lastSignIn as string)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={"secondary"}>
-                          {user.role.charAt(0).toUpperCase() +
-                            user.role.slice(1)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="flex justify-center">
-                        <Button
-                          variant={"link"}
-                          onClick={() => {}}
-                          className={"p-0 cursor-pointer"}
-                          title="Edit User"
-                        >
-                          <Pencil strokeWidth={3} fontSize={14} />
-                        </Button>
-                        <Button
-                          variant={"link"}
-                          onClick={() => {}}
-                          className={`p-0 cursor-pointer ${
-                            user.id === currentUser.user.id ? "hidden" : ""
-                          }`}
-                          title="Delete User"
-                        >
-                          <Dialog modal>
-                            <DialogTrigger asChild>
-                              <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
-                                <Trash
-                                  strokeWidth={3}
-                                  fontSize={14}
-                                  color="red"
-                                />
-                              </div>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Confirm User Delete</DialogTitle>
-                                <DialogDescription>
-                                  Do you wish to delete user {user.email}?
-                                </DialogDescription>
-                              </DialogHeader>
-                              <Button
-                                variant="destructive"
-                                onClick={() => handleDeleteUser(user.id)}
-                                type="button"
-                                className="cursor-pointer"
-                              >
-                                {loading ? <div className="animate-pulse">Deleting User...</div> : "Delete User"}
-                              </Button>
-                            </DialogContent>
-                          </Dialog>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+                {usersLoading || adminsLoading ? null : (
+                  <TableBody>
+                    {allUsers.map((user) => (
+                      <TableRow key={user.id} className="hover:bg-muted">
+                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell className="font-medium">{user.email}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatDate(user.created)}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatDateTime(user.lastSignIn as string)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={"secondary"}>{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</Badge>
+                        </TableCell>
+                        <TableCell className="flex justify-center">
+                          <Button
+                            variant={"link"}
+                            onClick={() =>
+                              handleEditUser(
+                                user.name.split(" ")[0],
+                                user.name.split(" ")[1],
+                                user.email || "",
+                                user.role.toLowerCase(),
+                                user.id
+                              )
+                            }
+                            className={"p-0 cursor-pointer"}
+                            title="Edit User">
+                            <Pencil strokeWidth={3} fontSize={14} />
+                          </Button>
+                          <Button
+                            variant={"link"}
+                            className={`p-0 cursor-pointer ${user.id === currentUser.user.id ? "hidden" : ""}`}
+                            title="Delete User">
+                            <Dialog modal>
+                              <DialogTrigger asChild>
+                                <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
+                                  <Trash strokeWidth={3} fontSize={14} color="red" />
+                                </div>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Confirm User Delete</DialogTitle>
+                                  <DialogDescription>Do you wish to delete user {user.email}?</DialogDescription>
+                                </DialogHeader>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  type="button"
+                                  className="cursor-pointer">
+                                  {loading ? <div className="animate-pulse">Deleting User...</div> : "Delete User"}
+                                </Button>
+                              </DialogContent>
+                            </Dialog>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                )}
               </Table>
             </CardContent>
           </Card>
@@ -332,7 +287,6 @@ export default function Users() {
               Next
             </Button>
           </div>
-          
         </div>
       </div>
     </div>

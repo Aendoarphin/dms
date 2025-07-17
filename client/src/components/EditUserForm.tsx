@@ -1,27 +1,34 @@
 import { useState } from "react";
-import { ArrowLeft, UserPlus } from "lucide-react";
+import { ArrowLeft, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import supabase from "@/util/supabase";
 
-export default function AddUserForm() {
+export default function EditUserForm() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    role: "",
+    firstName: searchParams.get("first")?.toString(),
+    lastName: searchParams.get("last")?.toString(),
+    email: searchParams.get("email")?.toString(),
+    role: searchParams.get("role")?.toString(),
   });
+
+  const elements = {
+    firstName: document.getElementById("firstName") as HTMLInputElement,
+    lastName: document.getElementById("lastName") as HTMLInputElement,
+    email: document.getElementById("email") as HTMLInputElement,
+    role: document.getElementById("role") as HTMLInputElement,
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,7 +42,7 @@ export default function AddUserForm() {
     setFormData((prev) => ({
       ...prev,
       role: value,
-    }));
+    })); // continue here; validate changed values before submitting
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,8 +59,6 @@ export default function AddUserForm() {
 
     const formInput = {
       email: formData.email,
-      email_confirm: true,
-      password: formData.password,
       user_metadata: {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -61,26 +66,34 @@ export default function AddUserForm() {
       },
     };
 
-    // Create the user
+    // Edit the user
     try {
-      const createUserRes = await axios.post(
-        "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
+      const editUserRes = await axios.put(
+        `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${searchParams.get("id")}`,
         formInput,
         config
       );
-      // Inert into admin table if role is admin
-      if (formData.role.toLowerCase() === "admin") {
+
+      // Insert into admin table if role is admin
+      if (formData.role?.toLowerCase() === "admin") {
         const insertRes = await supabase.from("administrators").insert({
-          user_id: createUserRes.data.user.id,
-          created_at: createUserRes.data.user.created_at,
+          user_id: editUserRes.data.user.id,
+          created_at: editUserRes.data.user.created_at,
         });
+        editUserRes;
         console.log(insertRes);
       }
 
+      // Delete from admin table if role is not admin
+      if (formData.role?.toLowerCase() !== "admin") {
+        const deleteRes = await supabase.from("administrators").delete().eq("user_id", editUserRes.data.user.id);
+        console.log(deleteRes);
+      }
+
       // Set user metadata
-      if (createUserRes.status === 201 && createUserRes.data.user) {
+      if (editUserRes.status === 201 && editUserRes.data.user) {
         const setUserMetadataRes = await axios.put(
-          `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${createUserRes.data.user.id}`,
+          `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${editUserRes.data.user.id}`,
           {
             user_metadata: {
               firstName: formData.firstName,
@@ -91,27 +104,19 @@ export default function AddUserForm() {
           config
         );
 
-        if (createUserRes.status === 201) {
+        if (editUserRes.status === 201) {
           toast.success("User created successfully", {
             style: { backgroundColor: "green", color: "white" },
           });
         }
 
         if (setUserMetadataRes.data.error) {
-          toast.error(createUserRes.data.error, {
+          toast.error(editUserRes.data.error, {
             style: { backgroundColor: "red", color: "white" },
           });
         }
-
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          password: "",
-          role: "",
-        });
       } else {
-        toast.error(createUserRes.data.error.code, {
+        toast.error(editUserRes.data.error.code, {
           style: { backgroundColor: "red", color: "white" },
         });
       }
@@ -124,9 +129,7 @@ export default function AddUserForm() {
     }
   };
 
-  const handleBack = () => {
-    navigate("/users");
-  };
+  const handleResetPassword = async () => {};
 
   return (
     <div className="min-h-screen bg-background">
@@ -137,13 +140,13 @@ export default function AddUserForm() {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <div className="flex items-center space-x-2 mb-2">
-                <Button variant="ghost" size="sm" onClick={handleBack} className="p-2 h-auto">
+                <Button variant="ghost" size="sm" onClick={() => navigate("/users")} className="p-2 h-auto">
                   <ArrowLeft className="h-4 w-4" />
                   Back
                 </Button>
               </div>
-              <h1 className="text-2xl font-bold">Add New User</h1>
-              <p className="text-muted-foreground">Create a new user account for the system</p>
+              <h1 className="text-2xl font-bold">Edit User</h1>
+              <p className="text-muted-foreground">Modify user information</p>
             </div>
           </div>
 
@@ -151,10 +154,10 @@ export default function AddUserForm() {
           <Card>
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <UserPlus className="h-5 w-5" />
+                <Edit3 className="h-5 w-5" />
                 <CardTitle>User Information</CardTitle>
               </div>
-              <CardDescription>Fill in the details below to create a new user account</CardDescription>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,7 +171,6 @@ export default function AddUserForm() {
                       placeholder="Enter first name"
                       value={formData.firstName}
                       onChange={handleInputChange}
-                      required
                     />
                   </div>
                   <div className="space-y-2">
@@ -180,7 +182,6 @@ export default function AddUserForm() {
                       placeholder="Enter last name"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      required
                     />
                   </div>
                 </div>
@@ -194,29 +195,18 @@ export default function AddUserForm() {
                     placeholder="Enter email address"
                     value={formData.email}
                     onChange={handleInputChange}
-                    required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Enter password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    required
-                    minLength={8}
-                    pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
-                    title="Password must at least 8 characters, contain at least one letter, one number, and one special character."
-                  />
+                  <Button variant={"outline"} onClick={handleResetPassword}>
+                    Send Password Reset Email
+                  </Button>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Select onValueChange={handleRoleChange} required>
+                  <Select value={formData.role} onValueChange={handleRoleChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a role" />
                     </SelectTrigger>
@@ -228,7 +218,7 @@ export default function AddUserForm() {
                 </div>
 
                 <div className="flex items-center justify-between pt-4">
-                  <Button type="button" variant="outline" onClick={handleBack}>
+                  <Button type="button" variant="outline" onClick={() => navigate("/users")}>
                     <ArrowLeft className="h-4 w-4" />
                     Cancel
                   </Button>
@@ -238,10 +228,7 @@ export default function AddUserForm() {
                         <div className="animate-pulse animation-duration-1000">Submitting...</div>
                       </>
                     ) : (
-                      <>
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Submit
-                      </>
+                      <>Save Changes</>
                     )}
                   </Button>
                 </div>

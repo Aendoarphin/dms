@@ -1,9 +1,9 @@
-import { ShieldAlert } from "lucide-react"
+import { ShieldAlert } from "lucide-react";
 
-import { Link } from "react-router"
+import { Link } from "react-router";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function NotFound() {
   return (
@@ -28,5 +28,5 @@ export default function NotFound() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

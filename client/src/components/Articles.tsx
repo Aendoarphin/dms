@@ -1,22 +1,10 @@
 import { Search, Calendar, User, Filter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,8 +17,7 @@ export default function Articles() {
     {
       id: 1,
       title: "Monthly Financial Reporting Best Practices",
-      description:
-        "Comprehensive guide to creating accurate and timely monthly financial reports for stakeholders.",
+      description: "Comprehensive guide to creating accurate and timely monthly financial reports for stakeholders.",
       category: "Accounting",
       author: "Sarah Johnson",
       publishDate: "2024-01-15",
@@ -49,8 +36,7 @@ export default function Articles() {
     {
       id: 3,
       title: "Incident Response Procedures",
-      description:
-        "Step-by-step procedures for handling operational incidents and minimizing business impact.",
+      description: "Step-by-step procedures for handling operational incidents and minimizing business impact.",
       category: "Operations",
       author: "Emily Rodriguez",
       publishDate: "2024-01-10",
@@ -59,8 +45,7 @@ export default function Articles() {
     {
       id: 4,
       title: "Network Security Configuration Guide",
-      description:
-        "Complete guide to configuring network security settings and implementing best practices.",
+      description: "Complete guide to configuring network security settings and implementing best practices.",
       category: "Information Technology",
       author: "David Kim",
       publishDate: "2024-01-08",
@@ -69,8 +54,7 @@ export default function Articles() {
     {
       id: 5,
       title: "Accounts Payable Automation",
-      description:
-        "How to streamline your accounts payable process using automation tools and workflows.",
+      description: "How to streamline your accounts payable process using automation tools and workflows.",
       category: "Accounting",
       author: "Lisa Wang",
       publishDate: "2024-01-05",
@@ -79,8 +63,7 @@ export default function Articles() {
     {
       id: 6,
       title: "SOX Compliance Framework",
-      description:
-        "Understanding and implementing Sarbanes-Oxley compliance requirements for public companies.",
+      description: "Understanding and implementing Sarbanes-Oxley compliance requirements for public companies.",
       category: "Compliance",
       author: "Robert Taylor",
       publishDate: "2024-01-03",
@@ -89,8 +72,7 @@ export default function Articles() {
     {
       id: 7,
       title: "Supply Chain Risk Management",
-      description:
-        "Strategies for identifying, assessing, and mitigating risks in your supply chain operations.",
+      description: "Strategies for identifying, assessing, and mitigating risks in your supply chain operations.",
       category: "Operations",
       author: "Jennifer Lee",
       publishDate: "2023-12-28",
@@ -99,8 +81,7 @@ export default function Articles() {
     {
       id: 8,
       title: "Cloud Migration Strategy",
-      description:
-        "Planning and executing a successful migration to cloud infrastructure with minimal downtime.",
+      description: "Planning and executing a successful migration to cloud infrastructure with minimal downtime.",
       category: "Information Technology",
       author: "Alex Thompson",
       publishDate: "2023-12-25",
@@ -109,8 +90,7 @@ export default function Articles() {
     {
       id: 9,
       title: "Employee Onboarding Checklist",
-      description:
-        "Comprehensive checklist to ensure smooth onboarding process for new team members.",
+      description: "Comprehensive checklist to ensure smooth onboarding process for new team members.",
       category: "Other",
       author: "Maria Garcia",
       publishDate: "2023-12-20",
@@ -119,8 +99,7 @@ export default function Articles() {
     {
       id: 10,
       title: "Budget Planning and Forecasting",
-      description:
-        "Advanced techniques for creating accurate budgets and financial forecasts for your organization.",
+      description: "Advanced techniques for creating accurate budgets and financial forecasts for your organization.",
       category: "Accounting",
       author: "James Wilson",
       publishDate: "2023-12-18",
@@ -139,8 +118,7 @@ export default function Articles() {
     {
       id: 12,
       title: "Disaster Recovery Planning",
-      description:
-        "Creating and maintaining effective disaster recovery plans to ensure business continuity.",
+      description: "Creating and maintaining effective disaster recovery plans to ensure business continuity.",
       category: "Operations",
       author: "Kevin Martinez",
       publishDate: "2023-12-12",
@@ -178,8 +156,7 @@ export default function Articles() {
     {
       value: "information-technology",
       label: "Information Technology",
-      count: allArticles.filter((a) => a.category === "Information Technology")
-        .length,
+      count: allArticles.filter((a) => a.category === "Information Technology").length,
     },
     {
       value: "collections",
@@ -202,18 +179,12 @@ export default function Articles() {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <h1 className="text-2xl font-bold">Knowledge Base Articles</h1>
-              <p className="text-muted-foreground">
-                Browse all published articles
-              </p>
+              <p className="text-muted-foreground">Browse all published articles</p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search articles..."
-                  className="w-full lg:w-[300px] pl-8"
-                />
+                <Input type="search" placeholder="Search articles..." className="w-full lg:w-[300px] pl-8" />
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -238,12 +209,7 @@ export default function Articles() {
           <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
             <div className="flex flex-wrap gap-2">
               {categories.map((category, index) => (
-                <Button
-                  key={category.value}
-                  variant={index === 0 ? "default" : "outline"}
-                  size="sm"
-                  className="h-8"
-                >
+                <Button key={category.value} variant={index === 0 ? "default" : "outline"} size="sm" className="h-8">
                   {category.label}
                   <Badge variant="secondary" className="ml-2">
                     {category.count}
@@ -279,30 +245,21 @@ export default function Articles() {
 
           {/* Results Summary */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              Showing {allArticles.length} articles
-            </p>
+            <p className="text-sm text-muted-foreground">Showing {allArticles.length} articles</p>
           </div>
 
           {/* Articles Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {allArticles.map((article) => (
-              <Card
-                key={article.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
-              >
+              <Card key={article.id} className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <Badge variant="outline" className="mb-2">
                       {article.category}
                     </Badge>
                   </div>
-                  <CardTitle className="line-clamp-2">
-                    {article.title}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-3">
-                    {article.description}
-                  </CardDescription>
+                  <CardTitle className="line-clamp-2">{article.title}</CardTitle>
+                  <CardDescription className="line-clamp-3">{article.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">

@@ -15,6 +15,7 @@ import NotFound from "./components/NotFound";
 import Editor from "./components/Editor";
 import useListenAuth from "./hooks/useListenAuth";
 import AddUserForm from "./components/AddUserForm";
+import EditUserForm from "./components/EditUserForm";
 
 export const SessionContext = createContext<Session | null>(null);
 
@@ -70,6 +71,7 @@ function App() {
 							<Route path="users" element={<Users />} />
 							<Route path="editor" element={<Editor />} />
 							<Route path="users/new" element={<AddUserForm />} />
+							<Route path="users/edit" element={<EditUserForm />} />
 						</Route>
 					)}
 					<Route path="*" element={<NotFound />} />

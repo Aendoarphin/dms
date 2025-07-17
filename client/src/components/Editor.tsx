@@ -1,20 +1,20 @@
-import { useState } from "react"
-import { FileText, Upload, Save, Eye, Calendar, Tag, User, ImageIcon, Link, Settings } from "lucide-react"
+import { useState } from "react";
+import { FileText, Upload, Save, Eye, Calendar, Tag, User, ImageIcon, Link, Settings } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 export default function Editor() {
-  const [title, setTitle] = useState("")
-  const [excerpt, setExcerpt] = useState("")
-  const [tags, setTags] = useState<string[]>(["Technology", "Web Development"])
-  const [isPublished, setIsPublished] = useState(false)
+  const [title, setTitle] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [tags, setTags] = useState<string[]>(["Technology", "Web Development"]);
+  const [isPublished, setIsPublished] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,7 +44,9 @@ export default function Editor() {
           </div>
 
           {/* Article Status Bar */}
-          <div hidden className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
+          <div
+            hidden
+            className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
             <div className="flex flex-wrap gap-2 items-center">
               <Badge variant={isPublished ? "default" : "secondary"}>{isPublished ? "Published" : "Draft"}</Badge>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -270,5 +272,5 @@ export default function Editor() {
         </div>
       </div>
     </div>
-  )
+  );
 }

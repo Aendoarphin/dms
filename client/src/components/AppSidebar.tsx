@@ -1,11 +1,4 @@
-import {
-  User as UserIcon,
-  Home,
-  BookOpen,
-  Shield,
-  LogOut,
-  Pencil,
-} from "lucide-react";
+import { User as UserIcon, Home, BookOpen, Shield, LogOut, Pencil } from "lucide-react";
 
 import {
   Dialog,
@@ -72,9 +65,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   const [admin, setAdmin] = useState<string | null>(null);
-  const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
-  );
+  const [currentUser] = useState(JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || ""));
 
   const handleLogout = async () => {
     await supabase.auth.signOut({ scope: "global" });
@@ -95,9 +86,7 @@ export function AppSidebar() {
         return [];
       }
 
-      setAdmin(
-        data.find((admin) => admin.user_id === currentUser.user.id).user_id
-      );
+      setAdmin(data.find((admin) => admin.user_id === currentUser.user.id).user_id);
     };
 
     getAdmin();
@@ -107,16 +96,11 @@ export function AppSidebar() {
     <Sidebar className="max-w-min">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-nowrap">
-            Logo Company Name
-          </SidebarGroupLabel>
+          <SidebarGroupLabel className="text-nowrap">Logo Company Name</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {
-                if (
-                  adminItems.includes(item.title) &&
-                  currentUser.user.id !== admin
-                ) {
+                if (adminItems.includes(item.title) && currentUser.user.id !== admin) {
                   return null;
                 }
 
@@ -135,16 +119,14 @@ export function AppSidebar() {
                             <DialogHeader>
                               <DialogTitle>Confirm Logout</DialogTitle>
                               <DialogDescription>
-                                Do you wish to log out? Any unsaved changes will
-                                be lost.
+                                Do you wish to log out? Any unsaved changes will be lost.
                               </DialogDescription>
                             </DialogHeader>
                             <Button
                               variant="destructive"
                               onClick={handleLogout}
                               type="button"
-                              className="cursor-pointer"
-                            >
+                              className="cursor-pointer">
                               Logout
                             </Button>
                           </DialogContent>
@@ -152,8 +134,7 @@ export function AppSidebar() {
                       ) : (
                         <Link
                           to={item.url}
-                          className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md"
-                        >
+                          className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md">
                           <item.icon size={16} />
                           <span>{item.title}</span>
                         </Link>
