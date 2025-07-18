@@ -16,19 +16,25 @@ export default function EditUserForm() {
 
   const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
+  // Store initial values
+  const initialValues = {
     firstName: searchParams.get("first")?.toString(),
     lastName: searchParams.get("last")?.toString(),
     email: searchParams.get("email")?.toString(),
     role: searchParams.get("role")?.toString(),
-  });
+  };
 
-  const elements = {
-    firstName: document.getElementById("firstName") as HTMLInputElement,
-    lastName: document.getElementById("lastName") as HTMLInputElement,
-    email: document.getElementById("email") as HTMLInputElement,
-    role: document.getElementById("role") as HTMLInputElement,
-  }
+  const [formData, setFormData] = useState(initialValues);
+
+  // Check if any field has changed from initial values
+  const hasChanges = () => {
+    return (
+      formData.firstName !== initialValues.firstName ||
+      formData.lastName !== initialValues.lastName ||
+      formData.email !== initialValues.email ||
+      formData.role !== initialValues.role
+    );
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,13 +48,11 @@ export default function EditUserForm() {
     setFormData((prev) => ({
       ...prev,
       role: value,
-    })); // continue here; validate changed values before submitting
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    setLoading(true);
 
     const config = {
       headers: {
@@ -57,71 +61,70 @@ export default function EditUserForm() {
       },
     };
 
-    const formInput = {
-      email: formData.email,
-      user_metadata: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        role: formData.role,
-      },
-    };
-
     // Edit the user
     try {
+      setLoading(true);
+
+      interface InputBody {
+        email?: string | null;
+        user_metadata: {
+          firstName?: string | null;
+          lastName?: string | null;
+          role?: string | null;
+        };
+      }
+
+      const inputBody: InputBody = { user_metadata: {} };
+
+      if (formData.firstName !== initialValues.firstName) {
+        inputBody.user_metadata.firstName = formData.firstName;
+      }
+      if (formData.lastName !== initialValues.lastName) {
+        inputBody.user_metadata.lastName = formData.lastName;
+      }
+      if (formData.email !== initialValues.email) {
+        inputBody.email = formData.email;
+      }
+      if (formData.role !== initialValues.role) {
+        inputBody.user_metadata.role = formData.role;
+      }
+
       const editUserRes = await axios.put(
         `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${searchParams.get("id")}`,
-        formInput,
+        inputBody,
         config
       );
 
-      // Insert into admin table if role is admin
-      if (formData.role?.toLowerCase() === "admin") {
-        const insertRes = await supabase.from("administrators").insert({
-          user_id: editUserRes.data.user.id,
-          created_at: editUserRes.data.user.created_at,
-        });
-        editUserRes;
-        console.log(insertRes);
+      let insertAdminRes = null;
+      let deleteAdminRes = null;
+
+      // If a new role was provided, update the user's role in the administrators table
+      if (editUserRes.status === 200 && formData.role !== initialValues.role) {
+        if (inputBody.user_metadata.role === "admin") {
+          insertAdminRes = await supabase.from("administrators").insert({
+            user_id: searchParams.get("id"),
+          });
+        } else if (inputBody.user_metadata.role !== "admin") {
+          deleteAdminRes = await supabase
+            .from("administrators")
+            .delete()
+            .match({ user_id: searchParams.get("id") });
+        }
       }
 
-      // Delete from admin table if role is not admin
-      if (formData.role?.toLowerCase() !== "admin") {
-        const deleteRes = await supabase.from("administrators").delete().eq("user_id", editUserRes.data.user.id);
-        console.log(deleteRes);
-      }
+      const timerDuration = 5000;
 
-      // Set user metadata
-      if (editUserRes.status === 201 && editUserRes.data.user) {
-        const setUserMetadataRes = await axios.put(
-          `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${editUserRes.data.user.id}`,
-          {
-            user_metadata: {
-              firstName: formData.firstName,
-              lastName: formData.lastName,
-              role: formData.role,
-            },
-          },
-          config
-        );
-
-        if (editUserRes.status === 201) {
-          toast.success("User created successfully", {
-            style: { backgroundColor: "green", color: "white" },
-          });
-        }
-
-        if (setUserMetadataRes.data.error) {
-          toast.error(editUserRes.data.error, {
-            style: { backgroundColor: "red", color: "white" },
-          });
-        }
-      } else {
-        toast.error(editUserRes.data.error.code, {
-          style: { backgroundColor: "red", color: "white" },
+      if (!insertAdminRes?.error || !deleteAdminRes?.error) {
+        toast.success("User updated successfully, redirecting " + timerDuration / 1000 + " seconds", {
+          style: { backgroundColor: "green", color: "white" },
+          duration: timerDuration,
         });
+        // Wait 5 seconds before redirecting
+        await new Promise((resolve) => setTimeout(resolve, timerDuration));
+        navigate("/users");
       }
     } catch (error) {
-      toast.error("Email is already in use", {
+      toast.error("Something went wrong", {
         style: { backgroundColor: "red", color: "white" },
       });
     } finally {
@@ -129,7 +132,23 @@ export default function EditUserForm() {
     }
   };
 
-  const handleResetPassword = async () => {};
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.email) {
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+        redirectTo: "http://localhost:5173/auth/reset",
+      });
+      if (error) {
+        toast.error(error.message, {
+          style: { backgroundColor: "red", color: "white" }, // continue here; implement admin based pw reset
+        });
+      } else {
+        toast.success("Password reset email sent successfully to " + formData.email, {
+          style: { backgroundColor: "green", color: "white" },
+        });
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -160,7 +179,7 @@ export default function EditUserForm() {
               <CardDescription></CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSaveChanges} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
@@ -222,13 +241,13 @@ export default function EditUserForm() {
                     <ArrowLeft className="h-4 w-4" />
                     Cancel
                   </Button>
-                  <Button type="submit">
+                  <Button type="submit" disabled={!hasChanges()} className="cursor-pointer">
                     {loading ? (
                       <>
                         <div className="animate-pulse animation-duration-1000">Submitting...</div>
                       </>
                     ) : (
-                      <>Save Changes</>
+                      "Save Changes"
                     )}
                   </Button>
                 </div>
