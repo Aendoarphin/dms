@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Upload, Save, Eye, Calendar, Tag, User, ImageIcon, Link, Settings } from "lucide-react";
+import { FileText, Upload, Save, Calendar, Tag, User, ImageIcon, Link, Settings, Eye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,7 @@ export default function Editor() {
               <p className="text-muted-foreground">Create and publish your article</p>
             </div>
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => window.open(`/preview?t=${title}&e=${excerpt}`, "_blank")}>
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>

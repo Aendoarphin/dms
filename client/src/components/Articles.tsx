@@ -11,132 +11,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router";
+import { useState } from "react";
 
 export default function Articles() {
-  const allArticles = [
-    {
-      id: 1,
-      title: "Monthly Financial Reporting Best Practices",
-      description: "Comprehensive guide to creating accurate and timely monthly financial reports for stakeholders.",
-      category: "Accounting",
-      author: "Sarah Johnson",
-      publishDate: "2024-01-15",
-      tags: ["Financial Reports", "Best Practices", "Monthly Closing"],
-    },
-    {
-      id: 2,
-      title: "GDPR Compliance Checklist 2024",
-      description:
-        "Updated checklist ensuring your organization meets all GDPR requirements and data protection standards.",
-      category: "Compliance",
-      author: "Michael Chen",
-      publishDate: "2024-01-12",
-      tags: ["GDPR", "Data Protection", "Privacy"],
-    },
-    {
-      id: 3,
-      title: "Incident Response Procedures",
-      description: "Step-by-step procedures for handling operational incidents and minimizing business impact.",
-      category: "Operations",
-      author: "Emily Rodriguez",
-      publishDate: "2024-01-10",
-      tags: ["Incident Management", "Operations", "Emergency Response"],
-    },
-    {
-      id: 4,
-      title: "Network Security Configuration Guide",
-      description: "Complete guide to configuring network security settings and implementing best practices.",
-      category: "Information Technology",
-      author: "David Kim",
-      publishDate: "2024-01-08",
-      tags: ["Network Security", "Configuration", "Cybersecurity"],
-    },
-    {
-      id: 5,
-      title: "Accounts Payable Automation",
-      description: "How to streamline your accounts payable process using automation tools and workflows.",
-      category: "Accounting",
-      author: "Lisa Wang",
-      publishDate: "2024-01-05",
-      tags: ["Automation", "Accounts Payable", "Workflow"],
-    },
-    {
-      id: 6,
-      title: "SOX Compliance Framework",
-      description: "Understanding and implementing Sarbanes-Oxley compliance requirements for public companies.",
-      category: "Compliance",
-      author: "Robert Taylor",
-      publishDate: "2024-01-03",
-      tags: ["SOX", "Internal Controls", "Audit"],
-    },
-    {
-      id: 7,
-      title: "Supply Chain Risk Management",
-      description: "Strategies for identifying, assessing, and mitigating risks in your supply chain operations.",
-      category: "Operations",
-      author: "Jennifer Lee",
-      publishDate: "2023-12-28",
-      tags: ["Supply Chain", "Risk Management", "Vendor Management"],
-    },
-    {
-      id: 8,
-      title: "Cloud Migration Strategy",
-      description: "Planning and executing a successful migration to cloud infrastructure with minimal downtime.",
-      category: "Information Technology",
-      author: "Alex Thompson",
-      publishDate: "2023-12-25",
-      tags: ["Cloud Migration", "Infrastructure", "AWS"],
-    },
-    {
-      id: 9,
-      title: "Employee Onboarding Checklist",
-      description: "Comprehensive checklist to ensure smooth onboarding process for new team members.",
-      category: "Other",
-      author: "Maria Garcia",
-      publishDate: "2023-12-20",
-      tags: ["HR", "Onboarding", "Employee Experience"],
-    },
-    {
-      id: 10,
-      title: "Budget Planning and Forecasting",
-      description: "Advanced techniques for creating accurate budgets and financial forecasts for your organization.",
-      category: "Accounting",
-      author: "James Wilson",
-      publishDate: "2023-12-18",
-      tags: ["Budgeting", "Forecasting", "Financial Planning"],
-    },
-    {
-      id: 11,
-      title: "Data Retention Policies",
-      description:
-        "Establishing comprehensive data retention policies to meet regulatory requirements and business needs.",
-      category: "Compliance",
-      author: "Amanda Brown",
-      publishDate: "2023-12-15",
-      tags: ["Data Retention", "Records Management", "Legal"],
-    },
-    {
-      id: 12,
-      title: "Disaster Recovery Planning",
-      description: "Creating and maintaining effective disaster recovery plans to ensure business continuity.",
-      category: "Operations",
-      author: "Kevin Martinez",
-      publishDate: "2023-12-12",
-      tags: ["Disaster Recovery", "Business Continuity", "Risk Management"],
-    },
-    {
-      id: 13,
-      title: "Assessing payoffs and losses in collections",
-      description:
-        "Understanding how to assess payoffs and losses in collections to optimize recovery and minimize legal costs.",
-      category: "Collections",
-      author: "Emily Rodriguez",
-      publishDate: "2023-12-10",
-      tags: ["Collections", "Payoffs", "Losses"],
-    },
-  ];
+  const [categoryIndex, setCategoryIndex] = useState(0);
+  const [categoryValue, setCategoryValue] = useState("all");
 
-  interface Article {
+  const navigate = useNavigate();
+
+  interface ArticleCard {
     id: number;
     title: string;
     description: string;
@@ -147,39 +31,67 @@ export default function Articles() {
   }
 
   interface Category {
+    id: number;
     value: string;
     label: string;
     count: number;
   }
 
-  const categories = [
-    { value: "all", label: "All Articles", count: allArticles.length },
+  const allArticles: ArticleCard[] = [
     {
+      id: 1,
+      title: "Article 1",
+      description: "Description of article 1",
+      category: "Accounting",
+      author: "John Doe",
+      publishDate: "2023-01-01",
+      tags: ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10", "tag11", "tag12"],
+    },
+    {
+      id: 2,
+      title: "Article 2",
+      description: "Description of article 2",
+      category: "Compliance",
+      author: "Jane Doe",
+      publishDate: "2023-02-01",
+      tags: ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8", "tag9", "tag10", "tag11", "tag12"],
+    },
+  ]; // Fetch the array of articles here
+
+  const categories = [
+    { id: 1, value: "all", label: "All Articles", count: allArticles.length },
+    {
+      id: 2,
       value: "accounting",
       label: "Accounting",
       count: allArticles.filter((a) => a.category === "Accounting").length,
     },
     {
+      id: 3,
       value: "compliance",
       label: "Compliance",
       count: allArticles.filter((a) => a.category === "Compliance").length,
     },
     {
+      id: 4,
       value: "operations",
       label: "Operations",
       count: allArticles.filter((a) => a.category === "Operations").length,
     },
     {
+      id: 5,
       value: "information-technology",
       label: "Information Technology",
       count: allArticles.filter((a) => a.category === "Information Technology").length,
     },
     {
+      id: 6,
       value: "collections",
       label: "Collections",
       count: allArticles.filter((a) => a.category === "Collections").length,
     },
     {
+      id: 7,
       value: "other",
       label: "Other",
       count: allArticles.filter((a) => a.category === "Other").length,
@@ -222,10 +134,22 @@ export default function Articles() {
           </div>
 
           {/* Filter Bar */}
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-card rounded-lg">
             <div className="flex flex-wrap gap-2">
-              {categories.map((category, index) => (
-                <Button key={category.value} variant={index === 0 ? "default" : "outline"} size="sm" className="h-8">
+              {categories.map((category) => (
+                <Button
+                  key={category.value}
+                  variant={
+                    categoryIndex === category.id || categoryValue.toLowerCase() === category.value
+                      ? "default"
+                      : "outline"
+                  }
+                  onClick={() => {
+                    setCategoryIndex(category.id);
+                    setCategoryValue(category.value);
+                  }}
+                  size="sm"
+                  className="h-8">
                   {category.label}
                   <Badge variant="secondary" className="ml-2">
                     {category.count}
@@ -267,7 +191,15 @@ export default function Articles() {
           {/* Articles Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {allArticles.map((article) => (
-              <Card key={article.id} className="hover:shadow-md transition-shadow cursor-pointer">
+              <Card
+                onClick={() => navigate(`/articles/${article.id}`)}
+                key={article.id}
+                className={
+                  article.category.toLowerCase() === categoryValue.toLowerCase() ||
+                  categoryValue.toLowerCase() === "all"
+                    ? "hover:shadow-md transition-shadow cursor-pointer"
+                    : "hidden"
+                }>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <Badge variant="outline" className="mb-2">

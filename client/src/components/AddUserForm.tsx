@@ -150,17 +150,12 @@ export default function AddUserForm() {
 					{/* Header */}
 					<div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
 						<div>
-							<div className="flex items-center space-x-2 mb-2">
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={handleBack}
-									className="p-2 h-auto"
-								>
-									<ArrowLeft className="h-4 w-4" />
-									Back
-								</Button>
-							</div>
+							<div className="flex justify-between pt-4">
+            <Button variant="ghost" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Users
+            </Button>
+          </div>
 							<h1 className="text-2xl font-bold">Add New User</h1>
 							<p className="text-muted-foreground">
 								Create a new user account for the system

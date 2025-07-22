@@ -17,6 +17,8 @@ import useListenAuth from "./hooks/useListenAuth";
 import AddUserForm from "./components/AddUserForm";
 import EditUserForm from "./components/EditUserForm";
 import ResetPassword from "./components/ResetPassword";
+import Article from "./components/Article";
+import ArticlePreview from "./components/ArticlePreview";
 
 export const SessionContext = createContext<Session | null>(null);
 
@@ -72,8 +74,10 @@ function App() {
               <Route path="editor" element={<Editor />} />
               <Route path="users/new" element={<AddUserForm />} />
               <Route path="users/edit" element={<EditUserForm />} />
+              <Route path="articles/:id" element={<Article />} />
             </Route>
           )}
+          <Route path="preview" element={<ArticlePreview />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </SessionContext.Provider>

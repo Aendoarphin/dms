@@ -124,7 +124,7 @@ export default function Users() {
           </div>
 
           {/* Filter Bar */}
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-card rounded-lg">
             <div className="flex flex-wrap gap-2">
               <Button variant="default" size="sm" className="h-8">
                 All Users
