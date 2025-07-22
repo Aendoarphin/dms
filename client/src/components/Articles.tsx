@@ -136,6 +136,22 @@ export default function Articles() {
     },
   ];
 
+  interface Article {
+    id: number;
+    title: string;
+    description: string;
+    category: string;
+    author: string;
+    publishDate: string;
+    tags: string[];
+  }
+
+  interface Category {
+    value: string;
+    label: string;
+    count: number;
+  }
+
   const categories = [
     { value: "all", label: "All Articles", count: allArticles.length },
     {

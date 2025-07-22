@@ -155,7 +155,7 @@ export default function EditUserForm() {
 
 			if (!insertAdminRes?.error || !deleteAdminRes?.error) {
 				toast.success(
-					"User updated successfully, redirecting in" +
+					"User updated successfully, redirecting in " +
 						timerDuration / 1000 +
 						" seconds",
 					{
