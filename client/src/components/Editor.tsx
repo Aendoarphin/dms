@@ -27,20 +27,6 @@ export default function Editor() {
               <h1 className="text-2xl font-bold">Article Editor</h1>
               <p className="text-muted-foreground">Create and publish your article</p>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={() => window.open(`/preview?t=${title}&e=${excerpt}`, "_blank")}>
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
-              <Button variant="outline" size="sm">
-                <Save className="h-4 w-4 mr-2" />
-                Save Draft
-              </Button>
-              <Button>
-                <Upload className="h-4 w-4 mr-2" />
-                Publish
-              </Button>
-            </div>
           </div>
 
           {/* Article Status Bar */}
@@ -259,6 +245,10 @@ export default function Editor() {
             <p className="text-sm text-muted-foreground">Auto-saved at 3:42 PM</p>
             <div className="flex items-center space-x-2">
               <Button variant="outline">Cancel</Button>
+              <Button variant="outline" size="sm" onClick={() => window.open(`/preview?t=${title}&e=${excerpt}`, "_blank")}>
+                <Eye className="h-4 w-4 mr-2" />
+                Preview
+              </Button>
               <Button variant="outline">
                 <Save className="h-4 w-4 mr-2" />
                 Save Draft
