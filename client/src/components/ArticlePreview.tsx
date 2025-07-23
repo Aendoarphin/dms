@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from "react-router";
 
 export default function ArticlePreview() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams(); // continue here; add an rte module
+  const [searchParams] = useSearchParams();
 
   // Placeholder article data
   const article = {

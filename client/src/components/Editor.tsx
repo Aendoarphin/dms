@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { FileText, Upload, Save, Calendar, Tag, User, ImageIcon, Link, Settings, Eye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import RichTextEditor from "./RichTextEditor";
+import { SessionContext } from "@/App";
+
+interface Author {
+  id: number;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
 
 export default function Editor() {
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [tags, setTags] = useState<string[]>(["Technology", "Web Development"]);
+  const [tags, setTags] = useState<string[]>([]);
   const [isPublished, setIsPublished] = useState(false);
+  const currentUser = useContext(SessionContext);
 
   return (
     <div className="min-h-screen bg-background">
@@ -84,65 +94,7 @@ export default function Editor() {
                 </CardContent>
               </Card>
 
-              {/* Rich Text Editor Mock */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <FileText className="h-5 w-5" />
-                      <CardTitle>Content Editor</CardTitle>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Button variant="outline" size="sm">
-                        <ImageIcon className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Link className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  <CardDescription>Rich text editor for your article content</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* Mock Rich Text Editor */}
-                  <div className="border rounded-lg min-h-[400px] p-4 bg-background">
-                    <div className="border-b pb-2 mb-4 flex items-center space-x-2 text-sm">
-                      <Button variant="ghost" size="sm" className="h-8 px-2">
-                        <strong>B</strong>
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 px-2">
-                        <em>I</em>
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 px-2">
-                        <u>U</u>
-                      </Button>
-                      <div className="h-4 w-px bg-border mx-2" />
-                      <Select defaultValue="paragraph">
-                        <SelectTrigger className="w-[120px] h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="paragraph">Paragraph</SelectItem>
-                          <SelectItem value="heading1">Heading 1</SelectItem>
-                          <SelectItem value="heading2">Heading 2</SelectItem>
-                          <SelectItem value="heading3">Heading 3</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="prose max-w-none">
-                      <p className="text-muted-foreground">
-                        Start writing your article here... This is where React Quill will be integrated.
-                      </p>
-                      <p className="text-muted-foreground mt-4">
-                        You can add rich formatting, images, links, and more to create engaging content.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <RichTextEditor />
             </div>
 
             {/* Sidebar */}
@@ -188,7 +140,9 @@ export default function Editor() {
                     <Label htmlFor="author">Author</Label>
                     <div className="flex items-center space-x-2 p-2 border rounded-lg">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">John Doe</span>
+                      <span className="text-sm">
+                        {currentUser?.user.user_metadata.firstName + " " + currentUser?.user.user_metadata.lastName}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -245,7 +199,10 @@ export default function Editor() {
             <p className="text-sm text-muted-foreground">Auto-saved at 3:42 PM</p>
             <div className="flex items-center space-x-2">
               <Button variant="outline">Cancel</Button>
-              <Button variant="outline" size="sm" onClick={() => window.open(`/preview?t=${title}&e=${excerpt}`, "_blank")}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`/preview?t=${title}&e=${excerpt}`, "_blank")}>
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>
