@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import RichTextEditor from "./RichTextEditor";
+import Quill from "./Quill";
 import { SessionContext } from "@/App";
 
 interface Author {
@@ -93,8 +93,7 @@ export default function Editor() {
                   </div>
                 </CardContent>
               </Card>
-
-              <RichTextEditor />
+              <Quill />
             </div>
 
             {/* Sidebar */}
