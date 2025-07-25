@@ -22,6 +22,7 @@ interface Author {
 export default function Editor() {
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [content, setContent] = useState();
   const [tags, setTags] = useState<string[]>([]);
   const [isPublished, setIsPublished] = useState(false);
   const currentUser = useContext(SessionContext);
@@ -89,6 +90,7 @@ export default function Editor() {
                       value={excerpt}
                       onChange={(e) => setExcerpt(e.target.value)}
                       rows={3}
+                      style={{ resize: "none" }}
                     />
                   </div>
                 </CardContent>
@@ -201,7 +203,7 @@ export default function Editor() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.open(`/preview?t=${title}&e=${excerpt}`, "_blank")}>
+                onClick={() => window.open(`/preview?t=${title}&e=${excerpt}&c=${content}`, "_blank")}>
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>

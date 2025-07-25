@@ -16,8 +16,8 @@ function Quill() {
         </div>
         <CardDescription>The main content of your article</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 border rounded-xl">
-        <ReactQuill theme="snow" value={value} onChange={setValue} modules={{ toolbar: true, history: true }} />
+      <CardContent>
+        <ReactQuill className="border border-muted-foreground rounded-md h-[420px] overflow-hidden font-stretch-200%" theme="snow" value={value} placeholder="Write something..." onChange={setValue} modules={{ toolbar: true, history: true }} />
       </CardContent>
     </Card>
   );
