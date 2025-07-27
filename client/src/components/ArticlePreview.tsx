@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router";
+import "react-quill-new/dist/quill.snow.css";
 
 export default function ArticlePreview() {
   const [searchParams] = useSearchParams();
@@ -110,9 +111,9 @@ export default function ArticlePreview() {
           {/* Article Content */}
           <Card>
             <CardContent className="pt-6">
-              <div className="prose prose-gray max-w-none">
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {article.content}
+              <div className="prose prose-gray max-w-none ql-snow">
+                <div className="whitespace-pre-wrap text-sm leading-relaxed ql-editor"
+                  dangerouslySetInnerHTML={{ __html: article.content }}>
                 </div>
               </div>
             </CardContent>
