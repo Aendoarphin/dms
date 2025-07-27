@@ -2,10 +2,9 @@ import { Calendar, User, Tag, Clock, Eye, ThumbsUp, Share2, Bookmark } from "luc
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
 export default function ArticlePreview() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   // Placeholder article data
@@ -21,90 +20,29 @@ export default function ArticlePreview() {
     views: 1247,
     likes: 42,
     tags: ["reconciliation", "accounting", "best-practices", "finance", "processes", "audit"],
-    content: `Introduction
+    content: searchParams.get("c") || "This is a sample article content for preview purposes."
+  }; // continue here; parse html string to html
 
-Financial reconciliation is a critical process that ensures the accuracy and integrity of financial records. This comprehensive guide will walk you through the best practices for implementing effective reconciliation processes in your organization.
-
-## What is Financial Reconciliation?
-
-Financial reconciliation is the process of comparing two sets of records to ensure they are in agreement and accurate. This typically involves matching internal financial records with external statements, such as bank statements, to identify and resolve any discrepancies.
-
-## Key Benefits
-
-- **Accuracy**: Ensures financial records are correct and complete
-- **Fraud Detection**: Helps identify unauthorized transactions or errors
-- **Compliance**: Meets regulatory requirements and audit standards
-- **Cash Flow Management**: Provides accurate cash position information
-
-## Best Practices
-
-### 1. Establish Regular Schedules
-
-Set up consistent reconciliation schedules based on account activity and importance:
-- Daily reconciliation for high-volume accounts
-- Weekly reconciliation for moderate activity accounts
-- Monthly reconciliation for low-activity accounts
-
-### 2. Implement Proper Documentation
-
-Maintain detailed records of all reconciliation activities:
-- Document all adjusting entries
-- Keep supporting documentation for variances
-- Create clear audit trails for all transactions
-
-### 3. Use Automation Where Possible
-
-Leverage technology to streamline the reconciliation process:
-- Automated bank feeds
-- Exception reporting
-- Workflow management systems
-
-### 4. Segregation of Duties
-
-Ensure proper internal controls by separating responsibilities:
-- Different people should prepare and review reconciliations
-- Independent approval for adjusting entries
-- Regular supervisory review of reconciliation processes
-
-## Common Challenges
-
-- **Timing Differences**: Transactions recorded in different periods
-- **Outstanding Items**: Checks or deposits in transit
-- **Bank Errors**: Mistakes made by financial institutions
-- **Data Entry Errors**: Manual input mistakes
-
-## Conclusion
-
-Implementing robust financial reconciliation processes is essential for maintaining accurate financial records and ensuring regulatory compliance. By following these best practices and maintaining consistent procedures, organizations can minimize errors and improve their overall financial management.
-
-Remember to regularly review and update your reconciliation procedures to ensure they remain effective and aligned with your organization's needs.
-    `
-  };
-
-  const relatedArticles = [
-    {
-      id: 2,
-      title: "Cash Flow Management Strategies",
-      category: "Accounting",
-      publishDate: "2024-01-10"
-    },
-    {
-      id: 3,
-      title: "Internal Controls and Audit Preparation",
-      category: "Compliance",
-      publishDate: "2024-01-05"
-    },
-    {
-      id: 4,
-      title: "Automated Accounting Systems Implementation",
-      category: "Information Technology",
-      publishDate: "2023-12-28"
-    }
-  ];
-
-  const handleBack = () => {
-    navigate(-1);
-  };
+  // const relatedArticles = [
+  //   {
+  //     id: 2,
+  //     title: "Cash Flow Management Strategies",
+  //     category: "Accounting",
+  //     publishDate: "2024-01-10"
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "Internal Controls and Audit Preparation",
+  //     category: "Compliance",
+  //     publishDate: "2024-01-05"
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "Automated Accounting Systems Implementation",
+  //     category: "Information Technology",
+  //     publishDate: "2023-12-28"
+  //   }
+  // ];
 
   return (
     <div className="min-h-screen bg-background">
