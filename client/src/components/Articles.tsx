@@ -5,12 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 
@@ -139,11 +134,7 @@ export default function Articles() {
               {categories.map((category) => (
                 <Button
                   key={category.value}
-                  variant={
-                    categoryIndex === category.id || categoryValue.toLowerCase() === category.value
-                      ? "default"
-                      : "outline"
-                  }
+                  variant={categoryIndex === category.id || categoryValue.toLowerCase() === category.value ? "default" : "outline"}
                   onClick={() => {
                     setCategoryIndex(category.id);
                     setCategoryValue(category.value);
@@ -195,8 +186,7 @@ export default function Articles() {
                 onClick={() => navigate(`/articles/${article.id}`)}
                 key={article.id}
                 className={
-                  article.category.toLowerCase() === categoryValue.toLowerCase() ||
-                  categoryValue.toLowerCase() === "all"
+                  article.category.toLowerCase() === categoryValue.toLowerCase() || categoryValue.toLowerCase() === "all"
                     ? "hover:shadow-md transition-shadow cursor-pointer"
                     : "hidden"
                 }>

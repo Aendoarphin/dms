@@ -17,9 +17,7 @@ export default function NotFound() {
           <CardDescription className="text-xl font-semibold">Page Not Found</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            The page you are looking for does not exist. Please check the URL and try again.
-          </p>
+          <p className="text-muted-foreground">The page you are looking for does not exist. Please check the URL and try again.</p>
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button asChild>

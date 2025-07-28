@@ -17,10 +17,7 @@ export default function Forbidden() {
           <CardDescription className="text-xl font-semibold">Access Forbidden</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">
-            You don't have permission to access this resource. Please contact your administrator if you believe this is
-            an error.
-          </p>
+          <p className="text-muted-foreground">You don't have permission to access this resource. Please contact your administrator if you believe this is an error.</p>
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button asChild>

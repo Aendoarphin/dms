@@ -9,14 +9,7 @@ import { useUsers } from "@/hooks/useUsers";
 import { useAdmins } from "@/hooks/useAdmins";
 import { Link, useNavigate } from "react-router";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import axios from "axios";
 import { useState } from "react";
 
@@ -95,9 +88,9 @@ export default function Users() {
   const handleEditUser = (first: string, last: string, email: string, role: string, id: string) => {
     navigate({
       pathname: "edit",
-      search: `?first=${encodeURIComponent(first)}&last=${encodeURIComponent(last)}&email=${encodeURIComponent(
-        email
-      )}&role=${encodeURIComponent(role)}&id=${encodeURIComponent(id)}`,
+      search: `?first=${encodeURIComponent(first)}&last=${encodeURIComponent(last)}&email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}&id=${encodeURIComponent(
+        id
+      )}`,
     });
   };
 
@@ -213,32 +206,19 @@ export default function Users() {
                         <TableCell className="font-medium">{user.name}</TableCell>
                         <TableCell className="font-medium">{user.email}</TableCell>
                         <TableCell className="text-muted-foreground">{formatDate(user.created)}</TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {formatDateTime(user.lastSignIn as string)}
-                        </TableCell>
+                        <TableCell className="text-muted-foreground">{formatDateTime(user.lastSignIn as string)}</TableCell>
                         <TableCell>
                           <Badge variant={"secondary"}>{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</Badge>
                         </TableCell>
                         <TableCell className="flex justify-center">
                           <Button
                             variant={"link"}
-                            onClick={() =>
-                              handleEditUser(
-                                user.name.split(" ")[0],
-                                user.name.split(" ")[1],
-                                user.email || "",
-                                user.role.toLowerCase(),
-                                user.id
-                              )
-                            }
+                            onClick={() => handleEditUser(user.name.split(" ")[0], user.name.split(" ")[1], user.email || "", user.role.toLowerCase(), user.id)}
                             className={"p-0 cursor-pointer"}
                             title="Edit User">
                             <Pencil strokeWidth={3} fontSize={14} />
                           </Button>
-                          <Button
-                            variant={"link"}
-                            className={`p-0 cursor-pointer ${user.id === currentUser.user.id ? "hidden" : ""}`}
-                            title="Delete User">
+                          <Button variant={"link"} className={`p-0 cursor-pointer ${user.id === currentUser.user.id ? "hidden" : ""}`} title="Delete User">
                             <Dialog modal>
                               <DialogTrigger asChild>
                                 <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
@@ -250,11 +230,7 @@ export default function Users() {
                                   <DialogTitle>Confirm User Delete</DialogTitle>
                                   <DialogDescription>Do you wish to delete user {user.email}?</DialogDescription>
                                 </DialogHeader>
-                                <Button
-                                  variant="destructive"
-                                  onClick={() => handleDeleteUser(user.id)}
-                                  type="button"
-                                  className="cursor-pointer">
+                                <Button variant="destructive" onClick={() => handleDeleteUser(user.id)} type="button" className="cursor-pointer">
                                   {loading ? <div className="animate-pulse">Deleting User...</div> : "Delete User"}
                                 </Button>
                               </DialogContent>

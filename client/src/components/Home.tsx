@@ -5,12 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Home() {
   const recentArticles = [
@@ -25,8 +20,7 @@ export default function Home() {
     {
       id: 2,
       title: "Navigating Online Banking",
-      excerpt:
-        "A step-by-step guide to using our online banking platform for secure and convenient account management.",
+      excerpt: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
       lastAccessed: "Yesterday",
       category: "Digital Banking",
       tags: ["Online Banking", "Mobile Banking", "Account Management"],
@@ -66,8 +60,7 @@ export default function Home() {
     {
       id: 7,
       title: "Navigating Online Banking",
-      excerpt:
-        "A step-by-step guide to using our online banking platform for secure and convenient account management.",
+      excerpt: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
       lastAccessed: "Yesterday",
       category: "Digital Banking",
       tags: ["Online Banking", "Mobile Banking", "Account Management"],
@@ -107,8 +100,7 @@ export default function Home() {
     {
       id: 12,
       title: "Navigating Online Banking",
-      excerpt:
-        "A step-by-step guide to using our online banking platform for secure and convenient account management.",
+      excerpt: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
       lastAccessed: "Yesterday",
       category: "Digital Banking",
       tags: ["Online Banking", "Mobile Banking", "Account Management"],

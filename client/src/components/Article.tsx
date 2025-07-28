@@ -77,7 +77,7 @@ Ensure proper internal controls by separating responsibilities:
 Implementing robust financial reconciliation processes is essential for maintaining accurate financial records and ensuring regulatory compliance. By following these best practices and maintaining consistent procedures, organizations can minimize errors and improve their overall financial management.
 
 Remember to regularly review and update your reconciliation procedures to ensure they remain effective and aligned with your organization's needs.
-    `
+    `,
   };
 
   const relatedArticles = [
@@ -85,20 +85,20 @@ Remember to regularly review and update your reconciliation procedures to ensure
       id: 2,
       title: "Cash Flow Management Strategies",
       category: "Accounting",
-      publishDate: "2024-01-10"
+      publishDate: "2024-01-10",
     },
     {
       id: 3,
       title: "Internal Controls and Audit Preparation",
       category: "Compliance",
-      publishDate: "2024-01-05"
+      publishDate: "2024-01-05",
     },
     {
       id: 4,
       title: "Automated Accounting Systems Implementation",
       category: "Information Technology",
-      publishDate: "2023-12-28"
-    }
+      publishDate: "2023-12-28",
+    },
   ];
 
   const handleBack = () => {
@@ -134,7 +134,7 @@ Remember to regularly review and update your reconciliation procedures to ensure
                     </Button>
                   </div>
                 </div>
-                
+
                 <div>
                   <h1 className="text-3xl font-bold mb-2">{article.title}</h1>
                   <p className="text-lg text-muted-foreground">{article.description}</p>
@@ -179,9 +179,7 @@ Remember to regularly review and update your reconciliation procedures to ensure
           <Card>
             <CardContent className="pt-6">
               <div className="prose prose-gray max-w-none">
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {article.content}
-                </div>
+                <div className="whitespace-pre-wrap text-sm leading-relaxed">{article.content}</div>
               </div>
             </CardContent>
           </Card>

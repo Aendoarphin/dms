@@ -1,24 +1,8 @@
 import { User as UserIcon, Home, BookOpen, Shield, LogOut, Pencil } from "lucide-react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import supabase from "@/util/supabase";
 import { useNavigate, Link } from "react-router";
 
@@ -118,23 +102,15 @@ export function AppSidebar() {
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Confirm Logout</DialogTitle>
-                              <DialogDescription>
-                                Do you wish to log out? Any unsaved changes will be lost.
-                              </DialogDescription>
+                              <DialogDescription>Do you wish to log out? Any unsaved changes will be lost.</DialogDescription>
                             </DialogHeader>
-                            <Button
-                              variant="destructive"
-                              onClick={handleLogout}
-                              type="button"
-                              className="cursor-pointer">
+                            <Button variant="destructive" onClick={handleLogout} type="button" className="cursor-pointer">
                               Logout
                             </Button>
                           </DialogContent>
                         </Dialog>
                       ) : (
-                        <Link
-                          to={item.url}
-                          className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md">
+                        <Link to={item.url} className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md">
                           <item.icon size={16} />
                           <span>{item.title}</span>
                         </Link>
