@@ -16,6 +16,7 @@ function Quill({
 	articleContent: string;
 	setArticleContent: (value: string) => void;
 }) {
+	localStorage.setItem("previewContent", articleContent);
 	return (
 		<Card>
 			<CardHeader>
@@ -27,7 +28,7 @@ function Quill({
 			</CardHeader>
 			<CardContent>
 				<ReactQuill
-					className="border border-muted-foreground rounded-md h-[420px] overflow-hidden font-stretch-200%"
+					className="border border-muted-foreground rounded-md min-h-[420px] overflow-hidden"
 					theme="snow"
 					value={articleContent}
 					placeholder="Write something..."

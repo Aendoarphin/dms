@@ -21,7 +21,7 @@ export default function ArticlePreview() {
     views: 1247,
     likes: 42,
     tags: ["reconciliation", "accounting", "best-practices", "finance", "processes", "audit"],
-    content: searchParams.get("c") || "This is a sample article content for preview purposes."
+    content: localStorage.getItem("previewContent") || "eee",
   }; // continue here; parse html string to html
 
   // const relatedArticles = [

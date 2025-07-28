@@ -246,9 +246,7 @@ export default function Editor() {
 									window.open(
 										`/preview?t=${encodeURIComponent(
 											title
-										)}&e=${encodeURIComponent(excerpt)}&c=${encodeURIComponent(
-											content
-										)}`,
+										)}&e=${encodeURIComponent(excerpt)}`,
 										"_blank"
 									)
 								}
