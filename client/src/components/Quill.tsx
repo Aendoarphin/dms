@@ -1,12 +1,6 @@
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import {
-	Card,
-	CardHeader,
-	CardContent,
-	CardDescription,
-	CardTitle,
-} from "./ui/card";
+import { Card, CardHeader, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { FileText } from "lucide-react";
 
 function Quill({
@@ -17,6 +11,23 @@ function Quill({
 	setArticleContent: (value: string) => void;
 }) {
 	localStorage.setItem("previewContent", articleContent);
+	const toolbarOptions = [
+		{ header: [1, 2, 3, 4, 5, 6, false] },
+		{ list: "ordered" },
+		{ list: "bullet" },
+		{ align: [] },
+		{ color: [] },
+		{ background: [] },
+		"bold",
+		"italic",
+		"underline",
+		"strike",
+		"blockquote",
+		"code-block",
+		"link",
+		"image",
+		"video",
+	];
 	return (
 		<Card>
 			<CardHeader>
@@ -31,9 +42,9 @@ function Quill({
 					className="border border-muted-foreground rounded-md min-h-[420px] overflow-hidden"
 					theme="snow"
 					value={articleContent}
-					placeholder="Write something..."
+					placeholder="Write your article content here..."
 					onChange={setArticleContent}
-					modules={{ toolbar: true }}
+					modules={{ toolbar: toolbarOptions }}
 				/>
 			</CardContent>
 		</Card>

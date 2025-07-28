@@ -50,9 +50,7 @@ export default function Editor() {
 					<div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
 						<div>
 							<h1 className="text-2xl font-bold">Article Editor</h1>
-							<p className="text-muted-foreground">
-								Create and publish your article
-							</p>
+							<p className="text-muted-foreground">Create and publish your article</p>
 						</div>
 					</div>
 
@@ -92,9 +90,7 @@ export default function Editor() {
 										<FileText className="h-5 w-5" />
 										<CardTitle>Article Details</CardTitle>
 									</div>
-									<CardDescription>
-										Basic information about your article
-									</CardDescription>
+									<CardDescription>Basic information about your article</CardDescription>
 								</CardHeader>
 								<CardContent className="space-y-4">
 									<div className="space-y-2">
@@ -192,11 +188,7 @@ export default function Editor() {
 								<CardContent className="space-y-4">
 									<div className="flex flex-wrap gap-2">
 										{tags.map((tag, index) => (
-											<Badge
-												key={index}
-												variant="secondary"
-												className="cursor-pointer"
-											>
+											<Badge key={index} variant="secondary" className="cursor-pointer">
 												{tag}
 												<button className="ml-1 text-xs">×</button>
 											</Badge>
@@ -234,9 +226,7 @@ export default function Editor() {
 
 					{/* Action Bar */}
 					<div className="flex items-center justify-between pt-4 border-t">
-						<p className="text-sm text-muted-foreground">
-							Auto-saved at 3:42 PM
-						</p>
+						<p className="text-sm text-muted-foreground">Auto-saved at 3:42 PM</p>
 						<div className="flex items-center space-x-2">
 							<Button variant="outline">Cancel</Button>
 							<Button
@@ -244,9 +234,9 @@ export default function Editor() {
 								size="sm"
 								onClick={() =>
 									window.open(
-										`/preview?t=${encodeURIComponent(
-											title
-										)}&e=${encodeURIComponent(excerpt)}`,
+										`/preview?t=${encodeURIComponent(title)}&e=${encodeURIComponent(
+											excerpt
+										)}`,
 										"_blank"
 									)
 								}
