@@ -8,30 +8,46 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import Quill from "./Quill";
 import { SessionContext } from "@/App";
+import axios from "axios";
+import supabase from "@/util/supabase";
 
 export default function Editor() {
   const [title, setTitle] = useState("");
-  const [excerpt, setExcerpt] = useState("");
+  const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
-  const [isPublished, setIsPublished] = useState(false);
   const currentUser = useContext(SessionContext);
   const [category, setCategory] = useState("operations");
 
+  interface Article {
+    title: string;
+    description?: string;
+    content: string;
+    tags?: string[];
+    category: string;
+  }
+
   const handlePublish = async () => {
-    try { // continue here; inset json into db
+    try {
       // Publish the article
-      console.log({
+
+      const { error } = await supabase.from("articles").insert({
         title,
-        excerpt,
+        description,
         content,
         tags,
-        isPublished,
         category,
+        email: currentUser?.user?.email,
       });
+
+      if (error) {
+        console.error("Error publishing article:", error);
+        return;
+      } else {
+        console.log("Article published successfully!");
+      }
     } catch (error) {
       console.error("Error publishing article:", error);
     }
@@ -73,7 +89,6 @@ export default function Editor() {
           {/* Article Status Bar */}
           <div hidden className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
             <div className="flex flex-wrap gap-2 items-center">
-              <Badge variant={isPublished ? "default" : "secondary"}>{isPublished ? "Published" : "Draft"}</Badge>
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
                 <span>Last saved: 2 minutes ago</span>
@@ -83,7 +98,6 @@ export default function Editor() {
               <Label htmlFor="publish-toggle" className="text-sm">
                 Publish immediately
               </Label>
-              <Switch id="publish-toggle" checked={isPublished} onCheckedChange={setIsPublished} />
             </div>
           </div>
 
@@ -105,12 +119,12 @@ export default function Editor() {
                     <Input id="title" placeholder="Enter article title..." value={title} onChange={(e) => setTitle(e.target.value)} className="text-lg" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="excerpt">Excerpt</Label>
+                    <Label htmlFor="description">Description</Label>
                     <Textarea
-                      id="excerpt"
+                      id="description"
                       placeholder="Brief description of your article..."
-                      value={excerpt}
-                      onChange={(e) => setExcerpt(e.target.value)}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                       rows={3}
                       style={{ resize: "none" }}
                     />
@@ -208,7 +222,7 @@ export default function Editor() {
             <p className="text-sm text-muted-foreground">Auto-saved at 3:42 PM</p>
             <div className="flex items-center space-x-2">
               <Button variant="outline">Cancel</Button>
-              <Button variant="outline" size="sm" onClick={() => window.open(`/preview?t=${encodeURIComponent(title)}&e=${encodeURIComponent(excerpt)}`, "_blank")}>
+              <Button variant="outline" size="sm" onClick={() => window.open(`/preview?t=${encodeURIComponent(title)}&e=${encodeURIComponent(description)}`, "_blank")}>
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>

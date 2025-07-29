@@ -12,7 +12,7 @@ export default function Home() {
     {
       id: 1,
       title: "Understanding Credit Union Membership",
-      excerpt: "Learn about the benefits and requirements of becoming a credit union member.",
+      description: "Learn about the benefits and requirements of becoming a credit union member.",
       lastAccessed: "2 hours ago",
       category: "Membership",
       tags: ["Membership", "Credit Union 101", "Benefits"],
@@ -20,7 +20,7 @@ export default function Home() {
     {
       id: 2,
       title: "Navigating Online Banking",
-      excerpt: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
+      description: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
       lastAccessed: "Yesterday",
       category: "Digital Banking",
       tags: ["Online Banking", "Mobile Banking", "Account Management"],
@@ -28,7 +28,7 @@ export default function Home() {
     {
       id: 3,
       title: "Applying for a Loan",
-      excerpt: "Find out how to apply for a loan, including the required documents and approval process.",
+      description: "Find out how to apply for a loan, including the required documents and approval process.",
       lastAccessed: "3 days ago",
       category: "Lending",
       tags: ["Loans", "Application Process", "Approval"],
@@ -36,7 +36,7 @@ export default function Home() {
     {
       id: 4,
       title: "Understanding Credit Scores",
-      excerpt: "Learn how credit scores are calculated and how to improve your credit score.",
+      description: "Learn how credit scores are calculated and how to improve your credit score.",
       lastAccessed: "1 week ago",
       category: "Financial Education",
       tags: ["Credit Scores", "Credit Reports", "Financial Literacy"],
@@ -44,7 +44,7 @@ export default function Home() {
     {
       id: 5,
       title: "Using Mobile Deposit",
-      excerpt: "A guide to using our mobile deposit feature to deposit checks remotely.",
+      description: "A guide to using our mobile deposit feature to deposit checks remotely.",
       lastAccessed: "2 weeks ago",
       category: "Digital Banking",
       tags: ["Mobile Deposit", "Remote Deposit", "Convenience"],
@@ -52,7 +52,7 @@ export default function Home() {
     {
       id: 6,
       title: "Protecting Against Identity Theft",
-      excerpt: "Tips and best practices for protecting your identity and preventing identity theft.",
+      description: "Tips and best practices for protecting your identity and preventing identity theft.",
       lastAccessed: "3 weeks ago",
       category: "Security",
       tags: ["Identity Theft", "Security", "Fraud Prevention"],
@@ -60,7 +60,7 @@ export default function Home() {
     {
       id: 7,
       title: "Navigating Online Banking",
-      excerpt: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
+      description: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
       lastAccessed: "Yesterday",
       category: "Digital Banking",
       tags: ["Online Banking", "Mobile Banking", "Account Management"],
@@ -68,7 +68,7 @@ export default function Home() {
     {
       id: 8,
       title: "Applying for a Loan",
-      excerpt: "Find out how to apply for a loan, including the required documents and approval process.",
+      description: "Find out how to apply for a loan, including the required documents and approval process.",
       lastAccessed: "3 days ago",
       category: "Lending",
       tags: ["Loans", "Application Process", "Approval"],
@@ -76,7 +76,7 @@ export default function Home() {
     {
       id: 9,
       title: "Understanding Credit Scores",
-      excerpt: "Learn how credit scores are calculated and how to improve your credit score.",
+      description: "Learn how credit scores are calculated and how to improve your credit score.",
       lastAccessed: "1 week ago",
       category: "Financial Education",
       tags: ["Credit Scores", "Credit Reports", "Financial Literacy"],
@@ -84,7 +84,7 @@ export default function Home() {
     {
       id: 10,
       title: "Using Mobile Deposit",
-      excerpt: "A guide to using our mobile deposit feature to deposit checks remotely.",
+      description: "A guide to using our mobile deposit feature to deposit checks remotely.",
       lastAccessed: "2 weeks ago",
       category: "Digital Banking",
       tags: ["Mobile Deposit", "Remote Deposit", "Convenience"],
@@ -92,7 +92,7 @@ export default function Home() {
     {
       id: 11,
       title: "Protecting Against Identity Theft",
-      excerpt: "Tips and best practices for protecting your identity and preventing identity theft.",
+      description: "Tips and best practices for protecting your identity and preventing identity theft.",
       lastAccessed: "3 weeks ago",
       category: "Security",
       tags: ["Identity Theft", "Security", "Fraud Prevention"],
@@ -100,7 +100,7 @@ export default function Home() {
     {
       id: 12,
       title: "Navigating Online Banking",
-      excerpt: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
+      description: "A step-by-step guide to using our online banking platform for secure and convenient account management.",
       lastAccessed: "Yesterday",
       category: "Digital Banking",
       tags: ["Online Banking", "Mobile Banking", "Account Management"],
@@ -108,7 +108,7 @@ export default function Home() {
     {
       id: 13,
       title: "Applying for a Loan",
-      excerpt: "Find out how to apply for a loan, including the required documents and approval process.",
+      description: "Find out how to apply for a loan, including the required documents and approval process.",
       lastAccessed: "3 days ago",
       category: "Lending",
       tags: ["Loans", "Application Process", "Approval"],
@@ -167,7 +167,7 @@ export default function Home() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground line-clamp-3">{article.excerpt}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-3">{article.description}</p>
                     </CardContent>
                     <CardFooter className="flex flex-col items-start space-y-2">
                       <Badge variant="outline">{article.category}</Badge>
