@@ -21,8 +21,8 @@ export default function ArticlePreview() {
     views: 1247,
     likes: 42,
     tags: ["reconciliation", "accounting", "best-practices", "finance", "processes", "audit"],
-    content: localStorage.getItem("previewContent") || "eee",
-  }; // continue here; parse html string to html
+    content: localStorage.getItem("previewContent") || "",
+  };
 
   // const relatedArticles = [
   //   {

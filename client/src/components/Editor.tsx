@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Quill from "./Quill";
 import { SessionContext } from "@/App";
-import axios from "axios";
 import supabase from "@/util/supabase";
+import { toast, Toaster } from "sonner";
 
 export default function Editor() {
   const [title, setTitle] = useState("");
@@ -20,19 +20,12 @@ export default function Editor() {
   const [tags, setTags] = useState<string[]>([]);
   const currentUser = useContext(SessionContext);
   const [category, setCategory] = useState("operations");
-
-  interface Article {
-    title: string;
-    description?: string;
-    content: string;
-    tags?: string[];
-    category: string;
-  }
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const handlePublish = async () => {
     try {
       // Publish the article
-
+      setIsPublishing(true);
       const { error } = await supabase.from("articles").insert({
         title,
         description,
@@ -44,12 +37,17 @@ export default function Editor() {
 
       if (error) {
         console.error("Error publishing article:", error);
+        toast.error(error.message, { style: { backgroundColor: "red", color: "white" } });
         return;
       } else {
         console.log("Article published successfully!");
+        toast.success("Article published successfully!", { style: { backgroundColor: "green", color: "white" } });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error publishing article:", error);
+      // toast.error(error.message, { style: { backgroundColor: "red", color: "white" } });
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -75,6 +73,7 @@ export default function Editor() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster duration={5000} position="top-right" />
       {/* Main Content */}
       <div className="p-6 lg:p-8">
         <div className="flex flex-col space-y-6 max-w-full mx-auto">
@@ -231,8 +230,8 @@ export default function Editor() {
                 Save Draft
               </Button>
               <Button onClick={handlePublish}>
-                <Upload className="h-4 w-4 mr-2" />
-                Publish Article
+                <Upload className={isPublishing ? "animate-pulse" : "h-4 w-4 mr-2"} />
+                {isPublishing ? "Publishing..." : "Publish"}
               </Button>
             </div>
           </div>
