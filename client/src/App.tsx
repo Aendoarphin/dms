@@ -23,82 +23,69 @@ import ArticlePreview from "./components/ArticlePreview";
 import { SessionContext } from "./context";
 
 function App() {
-  const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
-  
-  function checkViteServerStatus() {
-  fetch(import.meta.env.VITE_DEV_SERVER_URL)
-    .then(response => {
-      if (response.ok) {
-        console.log('Vite server is up');
-      } else {
-        console.log('Vite server is down');
-      }
-    })
-    .catch(error => {
-      console.error('Vite server is down:', error);
-    });
-}
+	const navigate = useNavigate();
 
-setInterval(checkViteServerStatus, (import.meta.env.VITE_CHECK_INTERVAL)* 60 * 1000); // Check every X minutes
+	const [session, setSession] = useState<Session | null>(null);
 
-  useEffect(() => {
-    // 1. Check for existing session on initial load
-    const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        setSession(session);
-      } else if (window.location.pathname !== "/login") {
-        navigate("/login", { replace: true });
-      }
-    };
+	useListenAuth(session?.user?.last_sign_in_at ?? "");
 
-    getInitialSession();
+	useEffect(() => {
+		// 1. Check for existing session on initial load
+		const getInitialSession = async () => {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
+			if (session) {
+				setSession(session);
+			} else if (window.location.pathname !== "/login") {
+				navigate("/login", { replace: true });
+			}
+		};
 
-    // 2. Listen for future auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") {
-        setSession(null);
-      } else if (session) {
-        setSession(session);
-      }
-    });
+		getInitialSession();
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
+		// 2. Listen for future auth state changes
+		const {
+			data: { subscription },
+		} = supabase.auth.onAuthStateChange((event, session) => {
+			if (event === "SIGNED_OUT") {
+				setSession(null);
+			} else if (session) {
+				setSession(session);
+			}
+		});
 
-  useListenAuth(session?.user?.last_sign_in_at ?? "");
+		return () => {
+			subscription.unsubscribe();
+		};
+	}, [navigate]);
 
-  return (
-    <>
-      <SessionContext.Provider value={session}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/auth/reset" element={<ResetPassword />} />
-          {session !== null && (
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="articles" element={<Articles />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="users" element={<Users />} />
-              <Route path="editor" element={<Editor />} />
-              <Route path="users/new" element={<AddUserForm />} />
-              <Route path="users/edit" element={<EditUserForm />} />
-              <Route path="articles/:id" element={<Article />} />
-            </Route>
-          )}
-          <Route path="preview" element={<ArticlePreview />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </SessionContext.Provider>
-    </>
-  );
+	useListenAuth(session?.user?.last_sign_in_at ?? "");
+
+	return (
+		<>
+			<SessionContext.Provider value={session}>
+				<Routes>
+					<Route path="/login" element={<Login />} />
+					<Route path="/auth/reset" element={<ResetPassword />} />
+					{session !== null && (
+						<Route path="/" element={<Layout />}>
+							<Route index element={<Home />} />
+							<Route path="articles" element={<Articles />} />
+							<Route path="profile" element={<Profile />} />
+							<Route path="users" element={<Users />} />
+							<Route path="editor" element={<Editor />} />
+							<Route path="users/new" element={<AddUserForm />} />
+							<Route path="users/edit" element={<EditUserForm />} />
+							<Route path="articles/:id" element={<Article />} />
+						</Route>
+					)}
+					<Route path="preview" element={<ArticlePreview />} />
+					<Route path="*" element={<NotFound />} />
+				</Routes>
+			</SessionContext.Provider>
+		</>
+	);
 }
 
 export default App;
