@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Quill from "./Quill";
-import { SessionContext } from "@/App";
+import { SessionContext } from "@/context";
 import supabase from "@/util/supabase";
 import { toast, Toaster } from "sonner";
 
@@ -43,7 +43,7 @@ export default function Editor() {
         console.log("Article published successfully!");
         toast.success("Article published successfully!", { style: { backgroundColor: "green", color: "white" } });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error publishing article:", error);
       // toast.error(error.message, { style: { backgroundColor: "red", color: "white" } });
     } finally {

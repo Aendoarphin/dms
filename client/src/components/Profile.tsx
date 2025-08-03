@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
-import { SessionContext } from "@/App";
+import { SessionContext } from "@/context";
 import supabase from "@/util/supabase";
 import { toast, Toaster } from "sonner";
 import { passwordMinLength, passwordPattern, passwordTitle } from "@/global";

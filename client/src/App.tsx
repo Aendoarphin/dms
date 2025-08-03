@@ -9,7 +9,7 @@ import Users from "./components/Users";
 import Layout from "./layout";
 import Login from "./components/Login";
 
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState } from "react";
 import { type Session } from "@supabase/supabase-js";
 import NotFound from "./components/NotFound";
 import Editor from "./components/Editor";
@@ -20,11 +20,27 @@ import ResetPassword from "./components/ResetPassword";
 import Article from "./components/Article";
 import ArticlePreview from "./components/ArticlePreview";
 
-export const SessionContext = createContext<Session | null>(null);
+import { SessionContext } from "./context";
 
 function App() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
+  
+  function checkViteServerStatus() {
+  fetch(import.meta.env.VITE_DEV_SERVER_URL)
+    .then(response => {
+      if (response.ok) {
+        console.log('Vite server is up');
+      } else {
+        console.log('Vite server is down');
+      }
+    })
+    .catch(error => {
+      console.error('Vite server is down:', error);
+    });
+}
+
+setInterval(checkViteServerStatus, (import.meta.env.VITE_CHECK_INTERVAL)* 60 * 1000); // Check every X minutes
 
   useEffect(() => {
     // 1. Check for existing session on initial load
