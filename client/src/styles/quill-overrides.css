@@ -1,0 +1,15 @@
+/* identify selectors using dev tools */
+
+.ql-toolbar.ql-snow {
+  border-width: 0px 0px 1px 0px !important;
+  border-color: var(--color-muted-foreground) !important;
+}
+
+.ql-container.ql-snow {
+  border: none !important;
+}
+
+.ql-container.ql-snow .ql-editor {
+  border: none !important;
+  min-height: 400px !important;
+}
