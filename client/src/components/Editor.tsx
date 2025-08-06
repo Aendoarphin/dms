@@ -25,8 +25,7 @@ export default function Editor() {
 
   console.log(content);
 
-  const handlePublish = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePublish = async () => {
     try {
       const fetchResponse = await fetch(import.meta.env.VITE_DEV_SERVER_URL);
       if (fetchResponse.ok) {
@@ -74,7 +73,7 @@ export default function Editor() {
     e.preventDefault();
 
     if (e.key === "Enter") {
-      const newTag = e.currentTarget.value.trim();
+      const newTag = e.currentTarget.value.trim().toLowerCase();
       if (newTag) {
         const newTags = [...tags, newTag];
         setTags(newTags);
@@ -94,7 +93,6 @@ export default function Editor() {
     <div className="min-h-screen bg-background">
       <Toaster duration={5000} position="top-right" />
       {/* Main Content */}
-      <form onSubmit={(e) => handlePublish(e)}>
         <div className="p-6 lg:p-8">
           <div className="flex flex-col space-y-6 max-w-full mx-auto">
             {/* Header */}
@@ -214,26 +212,6 @@ export default function Editor() {
                     <Input placeholder="Add a tag..." onKeyUp={(e) => handleAddTag(e)} />
                   </CardContent>
                 </Card>
-
-                {/* Featured Image */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <ImageIcon className="h-5 w-5" />
-                      <CardTitle>Featured Image</CardTitle>
-                    </div>
-                    <CardDescription>Upload a featured image for your article</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                      <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-sm text-muted-foreground mb-2">Drag and drop an image here, or click to browse</p>
-                      <Button variant="outline" size="sm">
-                        Choose File
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
 
@@ -250,7 +228,7 @@ export default function Editor() {
                   <Save className="h-4 w-4 mr-2" />
                   Save Draft
                 </Button>
-                <Button type="submit" disabled={content === "<p><br></p>"}>
+                <Button onClick={handlePublish} disabled={content === "<p><br></p>" || title === "" || description === ""}>
                   <Upload className={isPublishing ? "animate-pulse" : "h-4 w-4 mr-2"} />
                   {isPublishing ? "Publishing..." : "Publish"}
                 </Button>
@@ -258,7 +236,6 @@ export default function Editor() {
             </div>
           </div>
         </div>
-      </form>
     </div>
   );
 }

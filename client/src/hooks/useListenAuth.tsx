@@ -25,6 +25,7 @@ export default function useListenAuth(signedInTime: string) {
 					window.alert("Could not connect to server. Please try again later.");
 				}
 			} catch (error) {
+				window.location.reload();
 				console.error("Error checking session expiration:", error);
 			}
 		};
