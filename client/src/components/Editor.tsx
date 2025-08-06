@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { FileText, Upload, Save, Calendar, Tag, User, ImageIcon, Eye } from "lucide-react";
+import { FileText, Upload, Save, Calendar, Tag, User, Eye } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
