@@ -4,7 +4,7 @@ import "@/styles/quill-overrides.css";
 import { Card, CardHeader, CardContent, CardDescription, CardTitle } from "./ui/card";
 import { FileText } from "lucide-react";
 
-function Quill({ articleContent, setArticleContent }: { articleContent: string; setArticleContent: (value: string) => void }) {
+export default function Quill({ articleContent, setArticleContent }: { articleContent: string; setArticleContent: (value: string) => void }) {
   localStorage.setItem("previewContent", articleContent);
   const toolbarOptions = [
     { header: [1, 2, 3, 4, 5, 6, false] },
@@ -45,5 +45,3 @@ function Quill({ articleContent, setArticleContent }: { articleContent: string; 
     </Card>
   );
 }
-
-export default Quill;

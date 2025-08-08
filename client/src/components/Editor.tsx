@@ -23,8 +23,6 @@ export default function Editor() {
   const [category, setCategory] = useState("operations");
   const [isPublishing, setIsPublishing] = useState(false);
 
-  console.log(content);
-
   const handlePublish = async () => {
     try {
       const fetchResponse = await fetch(import.meta.env.VITE_DEV_SERVER_URL);
