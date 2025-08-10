@@ -67,11 +67,10 @@ export default function AddUserForm() {
       const createUserRes = await axios.post("https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user", formInput, config);
       // Inert into admin table if role is admin
       if (formData.role.toLowerCase() === "admin") {
-        const insertRes = await supabase.from("administrators").insert({
+        await supabase.from("administrators").insert({
           user_id: createUserRes.data.user.id,
           created_at: createUserRes.data.user.created_at,
         });
-        console.log(insertRes);
       }
 
       // Set user metadata
