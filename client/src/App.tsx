@@ -1,26 +1,27 @@
-import "./App.css";
+import "@/App.css";
 import { Routes, Route, useNavigate } from "react-router";
-import supabase from "./util/supabase";
+import supabase from "@/util/supabase";
 
-import Articles from "./components/Articles";
-import Home from "./components/Home";
-import Profile from "./components/Profile";
-import Users from "./components/Users";
-import Layout from "./layout";
-import Login from "./components/Login";
+import Articles from "@/components/Articles";
+import Home from "@/components/Home";
+import Profile from "@/components/Profile";
+import Users from "@/components/Users";
+import Layout from "@/layout";
+import Login from "@/components/Login";
 
 import { useEffect, useState } from "react";
 import { type Session } from "@supabase/supabase-js";
-import NotFound from "./components/NotFound";
-import Editor from "./components/Editor";
-import useListenAuth from "./hooks/useListenAuth";
-import AddUserForm from "./components/AddUserForm";
-import EditUserForm from "./components/EditUserForm";
-import ResetPassword from "./components/ResetPassword";
-import Article from "./components/Article";
-import ArticlePreview from "./components/ArticlePreview";
+import NotFound from "@/components/NotFound";
+import Editor from "@/components/Editor";
+import useListenAuth from "@/hooks/useListenAuth";
+import AddUserForm from "@/components/AddUserForm";
+import EditUserForm from "@/components/EditUserForm";
+import ResetPassword from "@/components/ResetPassword";
+import Article from "@/components/Article";
+import ArticlePreview from "@/components/ArticlePreview";
 
-import { SessionContext } from "./context";
+import { SessionContext } from "@/context";
+import useGetAdmin from "@/hooks/useGetAdmin";
 
 function App() {
 	const navigate = useNavigate();
@@ -61,6 +62,10 @@ function App() {
 	}, [navigate]);
 
 	useListenAuth(session?.user?.last_sign_in_at ?? "");
+	const currentUser = {
+		user: { id: session?.user.id ?? "" },
+	}
+	const adminId = useGetAdmin(currentUser);
 
 	return (
 		<>
@@ -68,13 +73,19 @@ function App() {
 				<Routes>
 					<Route path="/login" element={<Login />} />
 					<Route path="/auth/reset" element={<ResetPassword />} />
+					{/* session check */}
 					{session !== null && (
 						<Route path="/" element={<Layout />}>
 							<Route index element={<Home />} />
 							<Route path="articles" element={<Articles />} />
 							<Route path="profile" element={<Profile />} />
-							<Route path="users" element={<Users />} />
+							{/* admin check */}
+							{adminId === session.user.id && (
+								<>
+								<Route path="users" element={<Users />} />
 							<Route path="editor" element={<Editor />} />
+								</>
+							)}
 							<Route path="users/new" element={<AddUserForm />} />
 							<Route path="users/edit" element={<EditUserForm />} />
 							<Route path="articles/:id" element={<Article />} />
