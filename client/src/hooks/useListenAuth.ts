@@ -14,7 +14,7 @@ export default function useListenAuth(signedInTime: string) {
         const timeDiff = (currentTime - signedInTimestamp) / 1000 / 60;
         // minutes from time of sign-in
         if (
-          timeDiff > 120 &&
+          timeDiff > import.meta.env.VITE_SESSION_DURATION &&
           localStorage.getItem(import.meta.env.VITE_COOKIE) &&
           response.ok
         ) {
