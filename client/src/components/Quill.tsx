@@ -1,7 +1,7 @@
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import "@/styles/quill-overrides.css";
-import { Card, CardHeader, CardContent, CardDescription, CardTitle } from "./ui/card";
+import { Card, CardHeader, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
 export default function Quill({ articleContent, setArticleContent }: { articleContent: string; setArticleContent: (value: string) => void }) {
