@@ -7,15 +7,12 @@ import { useNavigate, useParams } from "react-router";
 import useArticles from "@/hooks/useArticles";
 import { useSanitizeHtml } from "@/hooks/useSanitizeHtml";
 
-import "@/styles/html-overrides.css";
-
 export default function Article() {
   const navigate = useNavigate();
-  const articles = useArticles();
   const params = useParams();
+  const articles = useArticles();
+  const article = articles?.find((a) => a.id.toString() === params.id?.toString() || "")
   
-  const article = articles?.find((a) => a.id.toString() === params.id?.toString() || "");
-
   return (
     <div className="min-h-screen bg-background">
       <div className="p-6 lg:p-8">
@@ -29,7 +26,7 @@ export default function Article() {
           </div>
 
           <Card>
-            <CardHeader className="pb-4">
+            <CardHeader>
               <div className="flex flex-col space-y-4">
                 <div className="flex items-start justify-between">
                   <Badge variant="outline">{article?.category}</Badge>
