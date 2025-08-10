@@ -29,6 +29,7 @@ import useArticles from "@/hooks/useArticles";
 export default function Articles() {
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [categoryValue, setCategoryValue] = useState("all");
+  const [filterValue, setFilterValue] = useState("newest");
   const articles = useArticles();
 
   const navigate = useNavigate();
@@ -80,6 +81,21 @@ export default function Articles() {
       count: allArticles.filter((a) => a.category === "Other").length,
     },
   ];
+
+  switch (filterValue) {
+    case "newest":
+      allArticles.sort((a, b) => b.publish_date.localeCompare(a.publish_date));
+      break;
+    case "oldest":
+      allArticles.sort((a, b) => a.publish_date.localeCompare(b.publish_date));
+      break;
+    case "title":
+      allArticles.sort((a, b) => a.title.localeCompare(b.title));
+      break;
+    case "author":
+      allArticles.sort((a, b) => a.email.localeCompare(b.email));
+      break;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -149,7 +165,7 @@ export default function Articles() {
               ))}
             </div>
             <div className="flex items-center space-x-2">
-              <Select defaultValue="newest">
+              <Select defaultValue={filterValue} onValueChange={setFilterValue}>
                 <SelectTrigger className="w-[140px] h-8">
                   <SelectValue />
                 </SelectTrigger>
