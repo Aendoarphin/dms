@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import supabase from "@/util/supabase";
 
+interface Admin {
+  id: string;
+  user_id: string;
+}
+
 export const useAdmins = () => {
-  const [admins, setAdmins] = useState<any[] | null>([]);
+  const [admins, setAdmins] = useState<Admin[] | null>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
