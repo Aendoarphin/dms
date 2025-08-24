@@ -1,4 +1,4 @@
-import { Search, Calendar, User, Filter } from "lucide-react";
+import { Search, Calendar, User, Filter, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,11 +25,25 @@ import {
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import useArticles from "@/hooks/useArticles";
-
+import useGetAdmin from "@/hooks/useGetAdmin";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import supabase from "@/util/supabase";
 export default function Articles() {
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [categoryValue, setCategoryValue] = useState("all");
   const [filterValue, setFilterValue] = useState("newest");
+  const [currentUser] = useState(
+    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
+  );
+  const [loading, setLoading] = useState(false);
+  const adminId = useGetAdmin(currentUser);
   const articles = useArticles();
 
   const navigate = useNavigate();
@@ -96,6 +110,18 @@ export default function Articles() {
       allArticles.sort((a, b) => a.email.localeCompare(b.email));
       break;
   }
+
+  const handleDeleteArticle = async (articleId: string) => {
+		setLoading(true);
+		const { error } = await supabase.from("articles").delete().eq('id', articleId)
+		setLoading(false);
+    if (error) {
+      window.alert("Could not delete article:" + articleId)
+    } else {
+      window.alert("Article was  deleted: " + articleId)
+    }
+    window.location.reload();
+	};
 
   return (
     <div className="min-h-screen bg-background">
@@ -201,19 +227,18 @@ export default function Articles() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {allArticles.map((article) => (
               <Card
-                onClick={() => navigate(`/articles/${article.id}`)}
                 key={article.id}
                 className={
                   article.category.toLowerCase() ===
                     categoryValue.toLowerCase() ||
                   categoryValue.toLowerCase() === "all"
-                    ? "hover:shadow-md transition-shadow cursor-pointer"
+                    ? "hover:shadow-md transition-shadow cursor-pointer relative z-1"
                     : "hidden"
                 }
               >
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <Badge variant="outline" className="mb-2">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="">
                       {article.category.includes(" ")
                         ? article.category
                             .split(" ")
@@ -225,8 +250,49 @@ export default function Articles() {
                         : article.category.charAt(0).toUpperCase() +
                           article.category.slice(1)}
                     </Badge>
+                    {currentUser.user.id === adminId && (
+                      <Button
+                        variant={"link"}
+                        className={`p-0 cursor-pointer`}
+                        title="Delete Article"
+                      >
+                        <Dialog modal>
+                          <DialogTrigger asChild>
+                            <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
+                              <Trash
+                                strokeWidth={3}
+                                fontSize={14}
+                                color="red"
+                              />
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Confirm Article Delete</DialogTitle>
+                              <DialogDescription>
+                                Do you wish to delete this article?
+                              </DialogDescription>
+                            </DialogHeader>
+                            <Button
+                              variant="destructive"
+                              onClick={() => handleDeleteArticle(article.id.toString())}
+                              type="button"
+                              className="cursor-pointer"
+                            >
+                              {loading ? (
+                                <div className="animate-pulse">
+                                  Deleting Article...
+                                </div>
+                              ) : (
+                                "Delete Article"
+                              )}
+                            </Button>
+                          </DialogContent>
+                        </Dialog>
+                      </Button>
+                    )}
                   </div>
-                  <CardTitle className="line-clamp-2 leading-normal">
+                  <CardTitle className="line-clamp-2 leading-normal cursor-pointer" onClick={() => navigate(`/articles/${article.id}`)}>
                     {article.title}
                   </CardTitle>
                   <CardDescription className="line-clamp-3">
