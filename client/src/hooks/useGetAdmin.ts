@@ -14,7 +14,7 @@ export default function useGetAdmin(currentUser: { user: { id: string } }) {
 			}
 
 			if (data) {
-				setAdminId(data.find((admin) => admin.user_id === currentUser.user.id).user_id);
+				setAdminId(data.find((admin) => admin.user_id === currentUser.user.id)?.user_id);
 			}
 		};
 

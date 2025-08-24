@@ -7,7 +7,7 @@ import { FileText } from "lucide-react";
 export default function Quill({ articleContent, setArticleContent }: { articleContent: string; setArticleContent: (value: string) => void }) {
   localStorage.setItem("previewContent", articleContent);
   const toolbarOptions = [
-    { header: [1, 2, 3, 4, 5, 6, false] },
+    { header: [1, 2, 3, false] },
     { list: "ordered" },
     { list: "bullet" },
     { align: [] },
@@ -18,10 +18,8 @@ export default function Quill({ articleContent, setArticleContent }: { articleCo
     "underline",
     "strike",
     "blockquote",
-    "code-block",
     "link",
     "image",
-    "video",
   ];
   return (
     <Card>

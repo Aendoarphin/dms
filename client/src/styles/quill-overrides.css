@@ -9,7 +9,23 @@
   border: none !important;
 }
 
-.ql-container.ql-snow .ql-editor {
+div.quill {
+  position: relative;
+  z-index: 0
+}
+
+.ql-container.ql-snow {
   border: none !important;
   min-height: 400px !important;
+  z-index: -2;
+}
+
+div.ql-editor.ql-blank {
+  position: relative;
+  z-index: 0;
+}
+
+span.ql-picker-item::before {
+  position: relative;
+  z-index: 2;
 }

@@ -1,4 +1,4 @@
-import { User as UserIcon, Home, BookOpen, Shield, LogOut, Pencil } from "lucide-react";
+import { User as UserIcon, Home, BookOpen, Shield, LogOut, Pencil, File } from "lucide-react";
 
 // sidebar items
 export const menuItems = [
@@ -26,6 +26,11 @@ export const menuItems = [
 		title: "Editor",
 		url: "editor",
 		icon: Pencil,
+	},
+	{
+		title: "Files",
+		url: "files",
+		icon: File,
 	},
 	{
 		title: "Logout",

@@ -19,84 +19,86 @@ import EditUserForm from "@/components/EditUserForm";
 import ResetPassword from "@/components/ResetPassword";
 import Article from "@/components/Article";
 import ArticlePreview from "@/components/ArticlePreview";
+import Files from "@/components/Files";
 
 import { SessionContext } from "@/context";
 import useGetAdmin from "@/hooks/useGetAdmin";
 
 function App() {
-	const navigate = useNavigate();
+  const navigate = useNavigate();
 
-	const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
-	useListenAuth(session?.user?.last_sign_in_at ?? "");
+  useListenAuth(session?.user?.last_sign_in_at ?? "");
 
-	useEffect(() => {
-		// 1. Check for existing session on initial load
-		const getInitialSession = async () => {
-			const {
-				data: { session },
-			} = await supabase.auth.getSession();
-			if (session) {
-				setSession(session);
-			} else if (window.location.pathname !== "/login") {
-				navigate("/login", { replace: true });
-			}
-		};
+  useEffect(() => {
+    // 1. Check for existing session on initial load
+    const getInitialSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        setSession(session);
+      } else if (window.location.pathname !== "/login") {
+        navigate("/login", { replace: true });
+      }
+    };
 
-		getInitialSession();
+    getInitialSession();
 
-		// 2. Listen for future auth state changes
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((event, session) => {
-			if (event === "SIGNED_OUT") {
-				setSession(null);
-			} else if (session) {
-				setSession(session);
-			}
-		});
+    // 2. Listen for future auth state changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        setSession(null);
+      } else if (session) {
+        setSession(session);
+      }
+    });
 
-		return () => {
-			subscription.unsubscribe();
-		};
-	}, [navigate]);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
-	useListenAuth(session?.user?.last_sign_in_at ?? "");
-	const currentUser = {
-		user: { id: session?.user.id ?? "" },
-	}
-	const adminId = useGetAdmin(currentUser);
+  useListenAuth(session?.user?.last_sign_in_at ?? "");
+  const currentUser = {
+    user: { id: session?.user.id ?? "" },
+  };
+  const adminId = useGetAdmin(currentUser);
 
-	return (
-		<>
-			<SessionContext.Provider value={session}>
-				<Routes>
-					<Route path="/login" element={<Login />} />
-					<Route path="/auth/reset" element={<ResetPassword />} />
-					{/* session check */}
-					{session !== null && (
-						<Route path="/" element={<Layout />}>
-							<Route index element={<Home />} />
-							<Route path="articles" element={<Articles />} />
-							<Route path="profile" element={<Profile />} />
-							{/* admin check */}
-							{adminId === session.user.id && (
-								<>
-								<Route path="users" element={<Users />} />
-							<Route path="editor" element={<Editor />} />
-								</>
-							)}
-							<Route path="users/new" element={<AddUserForm />} />
-							<Route path="users/edit" element={<EditUserForm />} />
-							<Route path="articles/:id" element={<Article />} />
-						</Route>
-					)}
-					<Route path="preview" element={<ArticlePreview />} />
-					<Route path="*" element={<NotFound />} />
-				</Routes>
-			</SessionContext.Provider>
-		</>
-	);
+  return (
+    <>
+      <SessionContext.Provider value={session}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/reset" element={<ResetPassword />} />
+          {/* session check */}
+          {session !== null && (
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="articles" element={<Articles />} />
+              <Route path="profile" element={<Profile />} />
+              {/* admin check */}
+              {adminId === session.user.id && (
+                <>
+                  <Route path="users" element={<Users />} />
+                  <Route path="editor" element={<Editor />} />
+                  <Route path="files" element={<Files />} />
+                </>
+              )}
+              <Route path="users/new" element={<AddUserForm />} />
+              <Route path="users/edit" element={<EditUserForm />} />
+              <Route path="articles/:id" element={<Article />} />
+            </Route>
+          )}
+          <Route path="preview" element={<ArticlePreview />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </SessionContext.Provider>
+    </>
+  );
 }
 
 export default App;

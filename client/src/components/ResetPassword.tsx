@@ -25,7 +25,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Toaster duration={5000} position="top-right" />
+      <Toaster duration={5000} position="bottom-right" />
 
       {/* Main Content */}
       <div className="p-6 lg:p-8">

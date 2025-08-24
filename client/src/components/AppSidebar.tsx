@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import useGetAdmin from "@/hooks/useGetAdmin";
 import { menuItems } from "@/static";
 
-const adminItems = ["Users", "Editor"];
+const adminItems = ["Users", "Editor", "Files"];
 
 export function AppSidebar() {
 	const [currentUser] = useState(

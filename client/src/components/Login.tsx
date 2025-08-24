@@ -36,7 +36,7 @@ export function Login() {
 
   return (
     <>
-      <Toaster duration={5000} position="top-right" />
+      <Toaster duration={5000} position="bottom-right" />
       <Card className="mx-auto mt-[25vh] max-w-xs container">
         <CardHeader>
           <CardTitle className="text-center text-2xl">

@@ -127,7 +127,7 @@ export default function AddUserForm() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Toaster duration={5000} position="top-right" />
+      <Toaster duration={5000} position="bottom-right" />
       <div className="p-6 lg:p-8">
         <div className="flex flex-col space-y-6 max-w-2xl mx-auto">
           {/* Header */}

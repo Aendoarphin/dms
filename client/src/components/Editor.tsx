@@ -89,7 +89,7 @@ export default function Editor() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Toaster duration={5000} position="top-right" />
+      <Toaster duration={5000} position="bottom-right" />
       {/* Main Content */}
         <div className="p-6 lg:p-8">
           <div className="flex flex-col space-y-6 max-w-full mx-auto">
@@ -156,14 +156,13 @@ export default function Editor() {
                 <Card>
                   <CardHeader>
                     <div className="flex items-center space-x-2">
-                      <Upload className="h-5 w-5" />
-                      <CardTitle>Publishing</CardTitle>
+                      <Tag className="h-5 w-5" />
+                      <CardTitle>Category</CardTitle>
                     </div>
-                    <CardDescription>Control when and how your article is published</CardDescription>
+                    <CardDescription>Specify the category to which your article belongs</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="category">Category</Label>
                       <Select defaultValue={category} onValueChange={setCategory}>
                         <SelectTrigger>
                           <SelectValue />
