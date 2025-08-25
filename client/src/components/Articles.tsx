@@ -27,12 +27,12 @@ import { useState } from "react";
 import useArticles from "@/hooks/useArticles";
 import useGetAdmin from "@/hooks/useGetAdmin";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import supabase from "@/util/supabase";
 export default function Articles() {
@@ -112,16 +112,19 @@ export default function Articles() {
   }
 
   const handleDeleteArticle = async (articleId: string) => {
-		setLoading(true);
-		const { error } = await supabase.from("articles").delete().eq('id', articleId)
-		setLoading(false);
+    setLoading(true);
+    const { error } = await supabase
+      .from("articles")
+      .delete()
+      .eq("id", articleId);
+    setLoading(false);
     if (error) {
-      window.alert("Could not delete article:" + articleId)
+      window.alert("Could not delete article:" + articleId);
     } else {
-      window.alert("Article was  deleted: " + articleId)
+      window.alert("Article was  deleted: " + articleId);
     }
     window.location.reload();
-	};
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -232,7 +235,7 @@ export default function Articles() {
                   article.category.toLowerCase() ===
                     categoryValue.toLowerCase() ||
                   categoryValue.toLowerCase() === "all"
-                    ? "hover:shadow-md transition-shadow cursor-pointer relative z-1"
+                    ? "hover:shadow-md transition-shadow relative z-1"
                     : "hidden"
                 }
               >
@@ -275,7 +278,9 @@ export default function Articles() {
                             </DialogHeader>
                             <Button
                               variant="destructive"
-                              onClick={() => handleDeleteArticle(article.id.toString())}
+                              onClick={() =>
+                                handleDeleteArticle(article.id.toString())
+                              }
                               type="button"
                               className="cursor-pointer"
                             >
@@ -292,7 +297,10 @@ export default function Articles() {
                       </Button>
                     )}
                   </div>
-                  <CardTitle className="line-clamp-2 leading-normal cursor-pointer" onClick={() => navigate(`/articles/${article.id}`)}>
+                  <CardTitle
+                    className="line-clamp-2 leading-normal cursor-pointer hover:underline"
+                    onClick={() => navigate(`/articles/${article.id}`)}
+                  >
                     {article.title}
                   </CardTitle>
                   <CardDescription className="line-clamp-3">

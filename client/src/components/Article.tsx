@@ -11,15 +11,22 @@ export default function Article() {
   const navigate = useNavigate();
   const params = useParams();
   const articles = useArticles();
-  const article = articles?.find((a) => a.id.toString() === params.id?.toString() || "")
-  
+  const article = articles?.find(
+    (a) => a.id.toString() === params.id?.toString() || ""
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <div className="p-6 lg:p-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Header with Back Navigation */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="pl-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="pl-2"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Articles
             </Button>
@@ -44,7 +51,9 @@ export default function Article() {
 
                 <div>
                   <h1 className="text-3xl font-bold mb-2">{article?.title}</h1>
-                  <p className="text-lg text-muted-foreground">{article?.description}</p>
+                  <p className="text-lg text-muted-foreground">
+                    {article?.description}
+                  </p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -73,8 +82,13 @@ export default function Article() {
           {/* Article Content */}
           <Card>
             <CardContent className="pt-6">
-              <div className="prose prose-gray max-w-none">
-                <div className="whitespace-pre-wrap text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: useSanitizeHtml(article?.content || "") }}></div>
+              <div className="prose prose-gray max-w-none ql-snow">
+                <div
+                  className="whitespace-pre-wrap text-sm leading-relaxed ql-editor"
+                  dangerouslySetInnerHTML={{
+                    __html: useSanitizeHtml(article?.content || ""),
+                  }}
+                ></div>
               </div>
             </CardContent>
           </Card>

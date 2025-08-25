@@ -50,7 +50,8 @@ import { useState } from "react";
 export default function Users() {
   const navigate = useNavigate();
 
-  const { users, loading: usersLoading, error: usersError } = useUsers();
+  const [refresh, setRefresh] = useState(false);
+  const { users, loading: usersLoading, error: usersError } = useUsers(refresh);
   const { admins, loading: adminsLoading, error: adminsError } = useAdmins();
   const [currentUser] = useState(
     JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
@@ -78,7 +79,7 @@ export default function Users() {
       }
     );
     if (response.status === 200) {
-      navigate("/users", { replace: true });
+      setRefresh(true);
     }
     setLoading(false);
   };

@@ -3,6 +3,10 @@
 .ql-toolbar.ql-snow {
   border-width: 0px 0px 1px 0px !important;
   border-color: var(--color-muted-foreground) !important;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: var(--color-card);
 }
 
 .ql-container.ql-snow {
@@ -28,4 +32,8 @@ div.ql-editor.ql-blank {
 span.ql-picker-item::before {
   position: relative;
   z-index: 2;
+}
+
+ol > li {
+  list-style: decimal;
 }

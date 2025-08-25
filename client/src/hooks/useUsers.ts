@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import type { User } from "@supabase/supabase-js";
 
-export const useUsers = () => {
+export const useUsers = (refresh: boolean) => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export const useUsers = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [refresh]);
 
   return { users, loading, error, refetch: fetchUsers };
 };

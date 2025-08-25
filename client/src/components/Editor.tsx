@@ -5,9 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import Quill from "@/components/Quill";
 import { SessionContext } from "@/context";
 import supabase from "@/util/supabase";
@@ -91,148 +103,206 @@ export default function Editor() {
     <div className="min-h-screen bg-background">
       <Toaster duration={5000} position="bottom-right" />
       {/* Main Content */}
-        <div className="p-6 lg:p-8">
-          <div className="flex flex-col space-y-6 max-w-full mx-auto">
-            {/* Header */}
-            <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-              <div>
-                <h1 className="text-2xl font-bold">Article Editor</h1>
-                <p className="text-muted-foreground">Create and publish your article</p>
+      <div className="p-6 lg:p-8">
+        <div className="flex flex-col space-y-6 max-w-full mx-auto">
+          {/* Header */}
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+            <div>
+              <h1 className="text-2xl font-bold">Article Editor</h1>
+              <p className="text-muted-foreground">
+                Create and publish your article
+              </p>
+            </div>
+          </div>
+
+          {/* Article Status Bar */}
+          <div
+            hidden
+            className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg"
+          >
+            <div className="flex flex-wrap gap-2 items-center">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                <Calendar className="h-4 w-4" />
+                <span>Last saved: 2 minutes ago</span>
               </div>
             </div>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="publish-toggle" className="text-sm">
+                Publish immediately
+              </Label>
+            </div>
+          </div>
 
-            {/* Article Status Bar */}
-            <div hidden className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-muted rounded-lg">
-              <div className="flex flex-wrap gap-2 items-center">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
-                  <span>Last saved: 2 minutes ago</span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="publish-toggle" className="text-sm">
-                  Publish immediately
-                </Label>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Editor */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Article Details */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <FileText className="h-5 w-5" />
+                    <CardTitle>Article Details</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Basic information about your article
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      placeholder="Enter article title..."
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="text-lg"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Brief description of your article..."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={3}
+                      style={{ resize: "none" }}
+                      required
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              <Quill articleContent={content} setArticleContent={setContent} />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Main Editor */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Article Details */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <FileText className="h-5 w-5" />
-                      <CardTitle>Article Details</CardTitle>
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Publishing Options */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <Tag className="h-5 w-5" />
+                    <CardTitle>Category</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Specify the category to which your article belongs
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Select defaultValue={category} onValueChange={setCategory}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="operations">Operations</SelectItem>
+                        <SelectItem value="accounting">Accounting</SelectItem>
+                        <SelectItem value="compliance">Compliance</SelectItem>
+                        <SelectItem value="information technology">
+                          Information Technology
+                        </SelectItem>
+                        <SelectItem value="human resources">
+                          Human Resources
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="author">Author</Label>
+                    <div className="flex items-center space-x-2 p-2 border rounded-lg">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">
+                        {currentUser?.user.user_metadata.firstName +
+                          " " +
+                          currentUser?.user.user_metadata.lastName}
+                      </span>
                     </div>
-                    <CardDescription>Basic information about your article</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Title</Label>
-                      <Input id="title" placeholder="Enter article title..." value={title} onChange={(e) => setTitle(e.target.value)} className="text-lg" required />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Brief description of your article..."
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={3}
-                        style={{ resize: "none" }}
-                        required
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-                <Quill articleContent={content} setArticleContent={setContent} />
-              </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Publishing Options */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <Tag className="h-5 w-5" />
-                      <CardTitle>Category</CardTitle>
-                    </div>
-                    <CardDescription>Specify the category to which your article belongs</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Select defaultValue={category} onValueChange={setCategory}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="operations">Operations</SelectItem>
-                          <SelectItem value="accounting">Accounting</SelectItem>
-                          <SelectItem value="compliance">Compliance</SelectItem>
-                          <SelectItem value="information technology">Information Technology</SelectItem>
-                          <SelectItem value="human resources">Human Resources</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="author">Author</Label>
-                      <div className="flex items-center space-x-2 p-2 border rounded-lg">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{currentUser?.user.user_metadata.firstName + " " + currentUser?.user.user_metadata.lastName}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Tags */}
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <Tag className="h-5 w-5" />
-                      <CardTitle>Tags</CardTitle>
-                    </div>
-                    <CardDescription>Add tags to help categorize your article</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary" className="cursor-pointer">
-                          {tag}
-                          <button className="ml-1 text-xs" onClick={() => handleRemoveTag(index)}>
-                            ×
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                    <Input placeholder="Add a tag..." onKeyUp={(e) => handleAddTag(e)} />
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Tags */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center space-x-2">
+                    <Tag className="h-5 w-5" />
+                    <CardTitle>Tags</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Add tags to help categorize your article
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="cursor-pointer"
+                      >
+                        {tag}
+                        <button
+                          className="ml-1 text-xs"
+                          onClick={() => handleRemoveTag(index)}
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <Input
+                    placeholder="Add a tag..."
+                    onKeyUp={(e) => handleAddTag(e)}
+                  />
+                </CardContent>
+              </Card>
             </div>
+          </div>
 
-            {/* Action Bar */}
-            <div className="flex items-center justify-between pt-4 border-t">
-              <p className="text-sm text-muted-foreground">Auto-saved at 3:42 PM</p>
-              <div className="flex items-center space-x-2">
-                <Button variant="outline">Cancel</Button>
-                <Button variant="outline" size="sm" onClick={() => window.open(`/preview?t=${encodeURIComponent(title)}&e=${encodeURIComponent(description)}`, "_blank")}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
-                </Button>
-                <Button variant="outline">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Draft
-                </Button>
-                <Button onClick={handlePublish} disabled={content === "<p><br></p>" || title === "" || description === ""}>
-                  <Upload className={isPublishing ? "animate-pulse" : "h-4 w-4 mr-2"} />
-                  {isPublishing ? "Publishing..." : "Publish"}
-                </Button>
-              </div>
+          {/* Action Bar */}
+          <div className="flex items-center justify-between pt-4 border-t">
+            <p className="text-sm text-muted-foreground">
+              Auto-saved at 3:42 PM
+            </p>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline">Cancel</Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  window.open(
+                    `/preview?t=${encodeURIComponent(
+                      title
+                    )}&e=${encodeURIComponent(description)}`,
+                    "_blank"
+                  )
+                }
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Preview
+              </Button>
+              <Button variant="outline">
+                <Save className="h-4 w-4 mr-2" />
+                Save Draft
+              </Button>
+              <Button
+                onClick={handlePublish}
+                disabled={
+                  content === "<p><br></p>" ||
+                  title === "" ||
+                  description === ""
+                }
+              >
+                <Upload
+                  className={isPublishing ? "animate-pulse" : "h-4 w-4 mr-2"}
+                />
+                {isPublishing ? "Publishing..." : "Publish"}
+              </Button>
             </div>
           </div>
         </div>
+      </div>
     </div>
   );
 }

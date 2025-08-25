@@ -1,15 +1,29 @@
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import "@/styles/quill-overrides.css";
-import { Card, CardHeader, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
-export default function Quill({ articleContent, setArticleContent }: { articleContent: string; setArticleContent: (value: string) => void }) {
+export default function Quill({
+  articleContent,
+  setArticleContent,
+}: {
+  articleContent: string;
+  setArticleContent: (value: string) => void;
+}) {
   localStorage.setItem("previewContent", articleContent);
   const toolbarOptions = [
     { header: [1, 2, 3, false] },
     { list: "ordered" },
     { list: "bullet" },
+    { indent: "-1" },
+    { indent: "+1" },
     { align: [] },
     { color: [] },
     { background: [] },
@@ -32,7 +46,7 @@ export default function Quill({ articleContent, setArticleContent }: { articleCo
       </CardHeader>
       <CardContent>
         <ReactQuill
-          className="border border-muted-foreground rounded-md min-h-[420px] overflow-hidden"
+          className="border border-muted-foreground rounded-md max-h-[420px] overflow-y-auto"
           theme="snow"
           value={articleContent}
           placeholder="Write your article content here..."
