@@ -120,8 +120,6 @@ export default function Articles() {
     setLoading(false);
     if (error) {
       window.alert("Could not delete article:" + articleId);
-    } else {
-      window.alert("Article was  deleted: " + articleId);
     }
     window.location.reload();
   };
@@ -315,7 +313,7 @@ export default function Articles() {
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-3 h-3 mr-1" />
-                      {new Date(article.publish_date).toLocaleDateString()}
+                      {new Date(article.publish_date).toDateString()}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1">
@@ -333,25 +331,6 @@ export default function Articles() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-center pt-4 space-x-2">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button variant="default" size="sm">
-              1
-            </Button>
-            <Button variant="outline" size="sm">
-              2
-            </Button>
-            <Button variant="outline" size="sm">
-              3
-            </Button>
-            <Button variant="outline" size="sm">
-              Next
-            </Button>
           </div>
         </div>
       </div>

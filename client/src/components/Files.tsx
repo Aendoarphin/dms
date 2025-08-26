@@ -1,10 +1,38 @@
-import { Search, FileIcon, Calendar, HardDrive, File, Pencil, Trash, Download } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Search,
+  FileIcon,
+  Calendar,
+  HardDrive,
+  File,
+  Pencil,
+  Trash,
+  Download,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -12,8 +40,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { useState } from "react"
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import { formatFileSize, formatDate, formatDateTime } from "@/util/helper";
 
 // Mock file data
 const mockFiles = [
@@ -77,104 +106,76 @@ const mockFiles = [
     owner: "Alex Rodriguez",
     category: "document",
   },
-]
+];
 
 export default function Files() {
-  const [loading, setLoading] = useState(false)
-  const [categoryValue, setCategoryValue] = useState("all")
-  const [sortValue, setSortValue] = useState("name")
-  const [searchQuery, setSearchQuery] = useState("")
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    })
-  }
-
-  const formatDateTime = (dateString: string) => {
-    if (!dateString) return null
-    return new Date(dateString).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    })
-  }
+  const [loading, setLoading] = useState(false);
+  const [categoryValue, setCategoryValue] = useState("all");
+  const [sortValue, setSortValue] = useState("name");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleDeleteFile = async (fileId: string) => {
-    setLoading(true)
+    setLoading(true);
     // Simulate API call
     setTimeout(() => {
-      console.log(`Deleting file with ID: ${fileId}`)
-      setLoading(false)
-    }, 1000)
-  }
+      console.log(`Deleting file with ID: ${fileId}`);
+      setLoading(false);
+    }, 1000);
+  };
 
   const handleDownloadFile = (fileId: string, fileName: string) => {
-    console.log(`Downloading file: ${fileName}`)
+    console.log(`Downloading file: ${fileName}`);
     // Simulate download
-  }
+  };
 
   const handleEditFile = (fileId: string, fileName: string) => {
-    console.log(`Editing file: ${fileName}`)
+    console.log(`Editing file: ${fileName}`);
     // Navigate to edit page or open edit modal
-  }
+  };
 
   // Filter files based on search and category
   const filteredFiles = mockFiles.filter((file) => {
     const matchesSearch =
       file.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      file.owner.toLowerCase().includes(searchQuery.toLowerCase())
+      file.owner.toLowerCase().includes(searchQuery.toLowerCase());
 
-    if (categoryValue === "all") return matchesSearch
-    return matchesSearch && file.category === categoryValue
-  })
+    if (categoryValue === "all") return matchesSearch;
+    return matchesSearch && file.category === categoryValue;
+  });
 
   // Sort files
   switch (sortValue) {
     case "newest":
       filteredFiles.sort((a, b) => {
-        return new Date(b.created).getTime() - new Date(a.created).getTime()
-      })
-      break
+        return new Date(b.created).getTime() - new Date(a.created).getTime();
+      });
+      break;
     case "oldest":
       filteredFiles.sort((a, b) => {
-        return new Date(a.created).getTime() - new Date(b.created).getTime()
-      })
-      break
+        return new Date(a.created).getTime() - new Date(b.created).getTime();
+      });
+      break;
     case "name":
       filteredFiles.sort((a, b) => {
-        return a.name.localeCompare(b.name)
-      })
-      break
+        return a.name.localeCompare(b.name);
+      });
+      break;
     case "size":
       filteredFiles.sort((a, b) => {
-        return b.size - a.size
-      })
-      break
+        return b.size - a.size;
+      });
+      break;
     case "modified":
       filteredFiles.sort((a, b) => {
-        return new Date(b.modified).getTime() - new Date(a.modified).getTime()
-      })
-      break
+        return new Date(b.modified).getTime() - new Date(a.modified).getTime();
+      });
+      break;
   }
 
   const getCategoryCount = (category: string) => {
-    if (category === "all") return mockFiles.length
-    return mockFiles.filter((file) => file.category === category).length
-  }
+    if (category === "all") return mockFiles.length;
+    return mockFiles.filter((file) => file.category === category).length;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -185,7 +186,9 @@ export default function Files() {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <h1 className="text-2xl font-bold">Files</h1>
-              <p className="text-muted-foreground">Manage all files in the system</p>
+              <p className="text-muted-foreground">
+                Manage all files in the system
+              </p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="relative">
@@ -262,7 +265,10 @@ export default function Files() {
               </Button>
             </div>
             <div className="flex items-center space-x-2">
-              <Select defaultValue="name" onValueChange={(e) => setSortValue(e)}>
+              <Select
+                defaultValue="name"
+                onValueChange={(e) => setSortValue(e)}
+              >
                 <SelectTrigger className="w-[140px] h-8">
                   <SelectValue />
                 </SelectTrigger>
@@ -279,7 +285,9 @@ export default function Files() {
 
           {/* Results Summary */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">Showing {filteredFiles.length} files</p>
+            <p className="text-sm text-muted-foreground">
+              Showing {filteredFiles.length} files
+            </p>
           </div>
 
           {/* Files Table */}
@@ -289,7 +297,9 @@ export default function Files() {
                 <FileIcon className="h-5 w-5" />
                 <CardTitle>File Library</CardTitle>
               </div>
-              <CardDescription>Complete list of all uploaded files</CardDescription>
+              <CardDescription>
+                Complete list of all uploaded files
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -328,48 +338,55 @@ export default function Files() {
                   {filteredFiles.map((file) => (
                     <TableRow key={file.id} className="hover:bg-muted">
                       <TableCell className="font-medium">{file.name}</TableCell>
-                      <TableCell className="text-muted-foreground">{formatFileSize(file.size)}</TableCell>
-                      <TableCell className="text-muted-foreground">{formatDate(file.created)}</TableCell>
-                      <TableCell className="text-muted-foreground">{formatDateTime(file.modified)}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatFileSize(file.size)}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatDate(file.created)}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatDateTime(file.modified)}
+                      </TableCell>
                       <TableCell>{file.owner}</TableCell>
                       <TableCell>
                         <Badge variant="secondary">{file.type}</Badge>
                       </TableCell>
                       <TableCell className="flex justify-center space-x-1">
                         <Button
-                          variant="ghost"
+                          variant="link"
                           size="sm"
                           onClick={() => handleDownloadFile(file.id, file.name)}
-                          className="p-2"
+                          className="p-2 cursor-pointer"
                           title="Download File"
                         >
-                          <Download className="h-4 w-4" />
+                          <Download strokeWidth={3} />
                         </Button>
                         <Button
-                          variant="ghost"
+                          variant="link"
                           size="sm"
                           onClick={() => handleEditFile(file.id, file.name)}
-                          className="p-2"
+                          className="p-2 cursor-pointer"
                           title="Edit File"
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil strokeWidth={3} />
                         </Button>
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button
-                              variant="ghost"
+                              variant="link"
                               size="sm"
-                              className="p-2 text-destructive hover:text-destructive"
+                              className="p-2 text-destructive hover:text-destructive cursor-pointer"
                               title="Delete File"
                             >
-                              <Trash className="h-4 w-4" />
+                              <Trash strokeWidth={3} />
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Confirm File Delete</DialogTitle>
                               <DialogDescription>
-                                Do you wish to delete the file "{file.name}"? This action cannot be undone.
+                                Do you wish to delete the file "{file.name}"?
+                                This action cannot be undone.
                               </DialogDescription>
                             </DialogHeader>
                             <div className="flex justify-end space-x-2">
@@ -391,27 +408,8 @@ export default function Files() {
               </Table>
             </CardContent>
           </Card>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-center space-x-2 pt-4">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button variant="default" size="sm">
-              1
-            </Button>
-            <Button variant="outline" size="sm">
-              2
-            </Button>
-            <Button variant="outline" size="sm">
-              3
-            </Button>
-            <Button variant="outline" size="sm">
-              Next
-            </Button>
-          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -350,7 +350,7 @@ export default function Users() {
                             className={"p-0 cursor-pointer"}
                             title="Edit User"
                           >
-                            <Pencil strokeWidth={3} fontSize={14} />
+                            <Pencil strokeWidth={3} />
                           </Button>
                           <Button
                             variant={"link"}
@@ -362,11 +362,7 @@ export default function Users() {
                             <Dialog modal>
                               <DialogTrigger asChild>
                                 <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
-                                  <Trash
-                                    strokeWidth={3}
-                                    fontSize={14}
-                                    color="red"
-                                  />
+                                  <Trash strokeWidth={3} color="red" />
                                 </div>
                               </DialogTrigger>
                               <DialogContent>
@@ -401,25 +397,6 @@ export default function Users() {
               </Table>
             </CardContent>
           </Card>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-center space-x-2 pt-4">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button variant="default" size="sm">
-              1
-            </Button>
-            <Button variant="outline" size="sm">
-              2
-            </Button>
-            <Button variant="outline" size="sm">
-              3
-            </Button>
-            <Button variant="outline" size="sm">
-              Next
-            </Button>
-          </div>
         </div>
       </div>
     </div>
