@@ -274,7 +274,10 @@ export default function Editor() {
                   window.open(
                     `/preview?t=${encodeURIComponent(
                       title
-                    )}&e=${encodeURIComponent(description)}`,
+                    )}&e=${encodeURIComponent(description)}
+                    &c=${encodeURIComponent(category)}
+                    &a=${encodeURIComponent(currentUser?.user.email || "")}
+                    &tags=${encodeURIComponent(JSON.stringify(tags))}`,
                     "_blank"
                   )
                 }
@@ -282,7 +285,7 @@ export default function Editor() {
                 <Eye className="h-4 w-4 mr-2" />
                 Preview
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" hidden>
                 <Save className="h-4 w-4 mr-2" />
                 Save Draft
               </Button>
