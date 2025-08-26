@@ -12,7 +12,7 @@ export default function Article() {
   const params = useParams();
   const articles = useArticles();
   const article = articles?.find(
-    (a) => a.id.toString() === params.id?.toString() || ""
+    (a) => a.id.toString() === params.id?.toString() || null
   );
 
   return (
@@ -38,11 +38,11 @@ export default function Article() {
                 <div className="flex items-start justify-between">
                   <Badge variant="outline">{article?.category}</Badge>
                   <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" hidden>
                       <Bookmark className="h-4 w-4 mr-1" />
                       Save
                     </Button>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" hidden>
                       <Share2 className="h-4 w-4 mr-1" />
                       Share
                     </Button>
@@ -63,7 +63,10 @@ export default function Article() {
                   </div>
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-1" />
-                    Published {article?.publish_date}
+                    Published{" "}
+                    {new Date(
+                      article ? article.publish_date : ""
+                    ).toDateString()}
                   </div>
                 </div>
 
