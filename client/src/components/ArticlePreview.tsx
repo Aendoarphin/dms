@@ -1,19 +1,6 @@
-import {
-  Calendar,
-  User,
-  Tag,
-  Clock,
-  Eye,
-  ThumbsUp,
-  Share2,
-  Bookmark,
-} from "lucide-react";
+import { Calendar, User, Tag, Share2, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSearchParams } from "react-router";
 import "react-quill-new/dist/quill.snow.css";
@@ -22,29 +9,23 @@ import { useSanitizeHtml } from "@/hooks/useSanitizeHtml";
 export default function ArticlePreview() {
   const [searchParams] = useSearchParams();
 
+  const previewData = {
+    title: searchParams.get("t") || "",
+    description: searchParams.get("e") || "",
+    category: searchParams.get("c") || "",
+    author: searchParams.get("a") || "",
+    tags: searchParams.get("tags") || "",
+  };
+
   // Placeholder article data
   const article = {
     id: 1,
-    title: searchParams.get("t") || "",
-    description: searchParams.get("e") || "",
-    category: "Accounting",
-    author: "Sarah Johnson",
-    publishDate: "2024-01-15",
-    lastUpdated: "2024-01-20",
-    readTime: "8 min read",
-    views: 1247,
-    likes: 42,
-    tags: [
-      "reconciliation",
-      "accounting",
-      "best-practices",
-      "finance",
-      "processes",
-      "audit",
-    ],
-    content: useSanitizeHtml(
-      localStorage.getItem("previewContent") || ""
-    ),
+    title: previewData.title,
+    description: previewData.description,
+    category: previewData.category,
+    author: previewData.author,
+    tags: JSON.parse(decodeURIComponent(previewData.tags)),
+    content: useSanitizeHtml(localStorage.getItem("previewContent") || ""),
   };
 
   return (
@@ -56,19 +37,13 @@ export default function ArticlePreview() {
             <CardHeader className="pb-4">
               <div className="flex flex-col space-y-4">
                 <div className="flex items-start justify-between">
-                  <Badge variant="outline">
-                    {article.category}
-                  </Badge>
+                  <Badge variant="outline">{article.category}</Badge>
                   <div className="flex items-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm">
+                    <Button variant="ghost" size="sm" hidden>
                       <Bookmark className="h-4 w-4 mr-1" />
                       Save
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm">
+                    <Button variant="ghost" size="sm" hidden>
                       <Share2 className="h-4 w-4 mr-1" />
                       Share
                     </Button>
@@ -76,9 +51,7 @@ export default function ArticlePreview() {
                 </div>
 
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">
-                    {article.title}
-                  </h1>
+                  <h1 className="text-3xl font-bold mb-2">{article.title}</h1>
                   <p className="text-lg text-muted-foreground">
                     {article.description}
                   </p>
@@ -91,33 +64,13 @@ export default function ArticlePreview() {
                   </div>
                   <div className="flex items-center">
                     <Calendar className="h-4 w-4 mr-1" />
-                    Published{" "}
-                    {new Date(
-                      article.publishDate
-                    ).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {article.content.split(" ").length /
-                      200}{" "}
-                    min read
-                  </div>
-                  <div className="flex items-center">
-                    <Eye className="h-4 w-4 mr-1" />
-                    {article.views.toLocaleString()} views
-                  </div>
-                  <div className="flex items-center">
-                    <ThumbsUp className="h-4 w-4 mr-1" />
-                    {article.likes} likes
+                    Published {new Date(Date.now()).toDateString()}
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {article.tags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="text-xs">
+                  {article.tags.map((tag: string, index: number) => (
+                    <Badge key={index} variant="secondary" className="text-xs">
                       <Tag className="h-3 w-3 mr-1" />
                       {tag}
                     </Badge>
@@ -135,7 +88,8 @@ export default function ArticlePreview() {
                   className="whitespace-pre-wrap text-sm leading-relaxed ql-editor"
                   dangerouslySetInnerHTML={{
                     __html: article.content,
-                  }}></div>
+                  }}
+                ></div>
               </div>
             </CardContent>
           </Card>
