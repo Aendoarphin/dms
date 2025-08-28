@@ -222,7 +222,7 @@ export default function EditUserForm() {
                     <ArrowLeft className="h-4 w-4" />
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={!hasChanges()} className="cursor-pointer">
+                  <Button type="submit" disabled={!hasChanges()}>
                     {loading ? (
                       <>
                         <div className="animate-pulse animation-duration-1000">Submitting...</div>

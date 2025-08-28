@@ -78,7 +78,6 @@ export function AppSidebar() {
 															variant="destructive"
 															onClick={handleLogout}
 															type="button"
-															className="cursor-pointer"
 														>
 															Logout
 														</Button>

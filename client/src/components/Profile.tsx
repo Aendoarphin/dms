@@ -150,7 +150,7 @@ export default function Profile() {
                 <div className="flex items-center space-x-2 pt-4">
                   <Button
                     type="submit"
-                    className="flex-1 sm:flex-none cursor-pointer"
+                    className="flex-1 sm:flex-none"
                     disabled={newPassword !== confirmPassword || newPassword === "" || confirmPassword === "" || newPassword.includes(" ") || confirmPassword.includes(" ")}>
                     Update Password
                   </Button>

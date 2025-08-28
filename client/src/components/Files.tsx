@@ -356,7 +356,7 @@ export default function Files() {
                           variant="link"
                           size="sm"
                           onClick={() => handleDownloadFile(file.id, file.name)}
-                          className="p-2 cursor-pointer"
+                          className="p-2"
                           title="Download File"
                         >
                           <Download strokeWidth={3} />
@@ -365,7 +365,7 @@ export default function Files() {
                           variant="link"
                           size="sm"
                           onClick={() => handleEditFile(file.id, file.name)}
-                          className="p-2 cursor-pointer"
+                          className="p-2"
                           title="Edit File"
                         >
                           <Pencil strokeWidth={3} />
@@ -375,7 +375,7 @@ export default function Files() {
                             <Button
                               variant="link"
                               size="sm"
-                              className="p-2 text-destructive hover:text-destructive cursor-pointer"
+                              className="p-2 text-destructive hover:text-destructive"
                               title="Delete File"
                             >
                               <Trash strokeWidth={3} />

@@ -193,7 +193,7 @@ export default function Users() {
                   className="w-full lg:w-[300px] pl-8"
                 />
               </div>
-              <Link to={"new"} className="cursor-pointer">
+              <Link to={"new"}>
                 <Button>Add User</Button>
               </Link>
             </div>
@@ -347,14 +347,14 @@ export default function Users() {
                                 user.id
                               )
                             }
-                            className={"p-0 cursor-pointer"}
+                            className={"p-0"}
                             title="Edit User"
                           >
                             <Pencil strokeWidth={3} />
                           </Button>
                           <Button
                             variant={"link"}
-                            className={`p-0 cursor-pointer ${
+                            className={`p-0 ${
                               user.id === currentUser.user.id ? "hidden" : ""
                             }`}
                             title="Delete User"
@@ -376,7 +376,6 @@ export default function Users() {
                                   variant="destructive"
                                   onClick={() => handleDeleteUser(user.id)}
                                   type="button"
-                                  className="cursor-pointer"
                                 >
                                   {loading ? (
                                     <div className="animate-pulse">

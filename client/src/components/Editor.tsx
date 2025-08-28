@@ -239,7 +239,6 @@ export default function Editor() {
                       <Badge
                         key={index}
                         variant="secondary"
-                        className="cursor-pointer"
                       >
                         {tag}
                         <button
