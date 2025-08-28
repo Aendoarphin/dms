@@ -39,6 +39,7 @@ export default function Articles() {
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [categoryValue, setCategoryValue] = useState("all");
   const [filterValue, setFilterValue] = useState("newest");
+  const [timeFilterValue, setTimeFilterValue] = useState("all-time");
   const [currentUser] = useState(
     JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
   );
@@ -48,7 +49,40 @@ export default function Articles() {
 
   const navigate = useNavigate();
 
-  const allArticles = articles ? articles : [];
+  const allArticles = articles
+    ? articles.filter((article) => {
+        const publishDate = new Date(article.publish_date);
+        const today = new Date();
+        const lastWeek = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate() - 7
+        );
+        const lastMonth = new Date(
+          today.getFullYear(),
+          today.getMonth() - 1,
+          today.getDate()
+        );
+        const lastQuarter = new Date(
+          today.getFullYear(),
+          today.getMonth() - 3,
+          today.getDate()
+        );
+
+        switch (timeFilterValue) {
+          case "all-time":
+            return true;
+          case "last-week":
+            return publishDate >= lastWeek;
+          case "last-month":
+            return publishDate >= lastMonth;
+          case "last-quarter":
+            return publishDate >= lastQuarter;
+          default:
+            return true;
+        }
+      })
+    : [];
 
   const categories = [
     {
@@ -203,7 +237,10 @@ export default function Articles() {
                   <SelectItem value="author">Author A-Z</SelectItem>
                 </SelectContent>
               </Select>
-              <Select defaultValue="all-time">
+              <Select
+                defaultValue="all-time"
+                onValueChange={setTimeFilterValue}
+              >
                 <SelectTrigger className="w-[120px] h-8">
                   <SelectValue />
                 </SelectTrigger>
@@ -254,7 +291,7 @@ export default function Articles() {
                     {currentUser.user.id === adminId && (
                       <Button
                         variant={"link"}
-                        className={`p-0 cursor-pointer`}
+                        className={`p-0`}
                         title="Delete Article"
                       >
                         <Dialog modal>
@@ -280,7 +317,6 @@ export default function Articles() {
                                 handleDeleteArticle(article.id.toString())
                               }
                               type="button"
-                              className="cursor-pointer"
                             >
                               {loading ? (
                                 <div className="animate-pulse">
