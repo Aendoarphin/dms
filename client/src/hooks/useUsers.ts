@@ -4,12 +4,10 @@ import type { User } from "@supabase/supabase-js";
 
 export const useUsers = (refresh: boolean) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     try {
-      setLoading(true);
       setError(null);
       const response = await axios.get(
         "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
@@ -24,8 +22,6 @@ export const useUsers = (refresh: boolean) => {
     } catch (error) {
       console.error("Error fetching users:", error);
       setError("Failed to fetch users");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -33,5 +29,5 @@ export const useUsers = (refresh: boolean) => {
     fetchUsers();
   }, [refresh]);
 
-  return { users, loading, error, refetch: fetchUsers };
+  return { users, error, refetch: fetchUsers };
 };
