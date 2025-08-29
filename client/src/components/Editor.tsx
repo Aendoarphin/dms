@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import { FileText, Upload, Save, Calendar, Tag, User, Eye } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Quill from "@/components/Quill";
+import QuillEditor from "@/components/QuillEditor";
 import { SessionContext } from "@/context";
 import supabase from "@/util/supabase";
 import { toast, Toaster } from "sonner";
@@ -28,6 +27,7 @@ import { toast, Toaster } from "sonner";
 export default function Editor() {
   const currentUser = useContext(SessionContext);
 
+  // Article input states
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
@@ -173,7 +173,10 @@ export default function Editor() {
                   </div>
                 </CardContent>
               </Card>
-              <Quill articleContent={content} setArticleContent={setContent} />
+              <QuillEditor
+                articleContent={content}
+                setArticleContent={setContent}
+              />
             </div>
 
             {/* Sidebar */}
@@ -236,10 +239,7 @@ export default function Editor() {
                 <CardContent className="space-y-4">
                   <div className="flex flex-wrap gap-2">
                     {tags.map((tag, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                      >
+                      <Badge key={index} variant="secondary">
                         {tag}
                         <button
                           className="ml-1 text-xs"

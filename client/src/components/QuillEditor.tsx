@@ -9,14 +9,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+import Quill from "quill";
+//@ts-expect-error: Ignore type decl
+import ImageResize from "quill-image-resize-module-react";
 
-export default function Quill({
+export default function QuillEditor({
   articleContent,
   setArticleContent,
 }: {
   articleContent: string;
   setArticleContent: (value: string) => void;
 }) {
+  Quill.register("modules/imageResize", ImageResize);
+
   localStorage.setItem("previewContent", articleContent);
   const toolbarOptions = [
     { header: [1, 2, 3, false] },
@@ -51,7 +56,13 @@ export default function Quill({
           value={articleContent}
           placeholder="Write your article content here..."
           onChange={setArticleContent}
-          modules={{ toolbar: toolbarOptions }}
+          modules={{
+            toolbar: toolbarOptions,
+            imageResize: {
+              parchment: Quill.import("parchment"),
+              modules: ["Resize", "DisplaySize", "Toolbar"],
+            },
+          }}
         />
       </CardContent>
     </Card>
