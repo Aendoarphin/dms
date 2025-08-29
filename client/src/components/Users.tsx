@@ -48,17 +48,19 @@ import axios from "axios";
 import { useState } from "react";
 
 export default function Users() {
-  const navigate = useNavigate();
 
   const [refresh, setRefresh] = useState(false);
-  const { users, loading: usersLoading, error: usersError } = useUsers(refresh);
-  const { admins, loading: adminsLoading, error: adminsError } = useAdmins();
+  
   const [currentUser] = useState(
     JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
   );
   const [loading, setLoading] = useState(false);
   const [categoryValue, setCategoryValue] = useState("all");
   const [sortValue, setSortValue] = useState("email");
+
+  const navigate = useNavigate();
+  const { users, error: usersError } = useUsers(refresh);
+  const { admins, error: adminsError } = useAdmins();
 
   const isAdmin = (userId: string) => {
     return admins?.some((admin) => admin.user_id === userId);
@@ -79,7 +81,7 @@ export default function Users() {
       }
     );
     if (response.status === 200) {
-      setRefresh(true);
+      setRefresh(!refresh);
     }
     setLoading(false);
   };
@@ -304,95 +306,92 @@ export default function Users() {
                     <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
-                {usersLoading || adminsLoading ? null : (
-                  <TableBody>
-                    {allUsers.map((user) => (
-                      <TableRow
-                        key={user.id}
-                        className="hover:bg-muted"
-                        hidden={
-                          categoryValue !== "all" &&
-                          ((categoryValue === "admins" &&
-                            user.role !== "Admin") ||
-                            (categoryValue === "users" && user.role !== "User"))
-                        }
-                      >
-                        <TableCell className="font-medium">
-                          {user.name}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {user.email}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {formatDate(user.created)}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {formatDateTime(user.lastSignIn as string)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={"secondary"}>
-                            {user.role.charAt(0).toUpperCase() +
-                              user.role.slice(1)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="flex justify-center">
-                          <Button
-                            variant={"link"}
-                            onClick={() =>
-                              handleEditUser(
-                                user.name.split(" ")[0],
-                                user.name.split(" ")[1],
-                                user.email || "",
-                                user.role.toLowerCase(),
-                                user.id
-                              )
-                            }
-                            className={"p-0"}
-                            title="Edit User"
-                          >
-                            <Pencil strokeWidth={3} />
-                          </Button>
-                          <Button
-                            variant={"link"}
-                            className={`p-0 ${
-                              user.id === currentUser.user.id ? "hidden" : ""
-                            }`}
-                            title="Delete User"
-                          >
-                            <Dialog modal>
-                              <DialogTrigger asChild>
-                                <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
-                                  <Trash strokeWidth={3} color="red" />
-                                </div>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Confirm User Delete</DialogTitle>
-                                  <DialogDescription>
-                                    Do you wish to delete user {user.email}?
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <Button
-                                  variant="destructive"
-                                  onClick={() => handleDeleteUser(user.id)}
-                                  type="button"
-                                >
-                                  {loading ? (
-                                    <div className="animate-pulse">
-                                      Deleting User...
-                                    </div>
-                                  ) : (
-                                    "Delete User"
-                                  )}
-                                </Button>
-                              </DialogContent>
-                            </Dialog>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                )}
+
+                <TableBody>
+                  {allUsers.map((user) => (
+                    <TableRow
+                      key={user.id}
+                      className="hover:bg-muted"
+                      hidden={
+                        categoryValue !== "all" &&
+                        ((categoryValue === "admins" &&
+                          user.role !== "Admin") ||
+                          (categoryValue === "users" && user.role !== "User"))
+                      }
+                    >
+                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell className="font-medium">
+                        {user.email}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatDate(user.created)}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {formatDateTime(user.lastSignIn as string)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={"secondary"}>
+                          {user.role.charAt(0).toUpperCase() +
+                            user.role.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="flex justify-center">
+                        <Button
+                          variant={"link"}
+                          onClick={() =>
+                            handleEditUser(
+                              user.name.split(" ")[0],
+                              user.name.split(" ")[1],
+                              user.email || "",
+                              user.role.toLowerCase(),
+                              user.id
+                            )
+                          }
+                          className={"p-0"}
+                          title="Edit User"
+                        >
+                          <Pencil strokeWidth={3} />
+                        </Button>
+                        <Button
+                          variant={"link"}
+                          className={`p-0 ${
+                            user.id === currentUser.user.id ? "hidden" : ""
+                          }`}
+                          title="Delete User"
+                        >
+                          <Dialog modal>
+                            <DialogTrigger asChild>
+                              <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
+                                <Trash strokeWidth={3} color="red" />
+                              </div>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Confirm User Delete</DialogTitle>
+                                <DialogDescription>
+                                  Do you wish to delete user {user.email}?
+                                </DialogDescription>
+                              </DialogHeader>
+                              <Button
+                                variant="destructive"
+                                onClick={() => handleDeleteUser(user.id)}
+                                type="button"
+                              >
+                                {loading ? (
+                                  <div className="animate-pulse">
+                                    Deleting User...
+                                  </div>
+                                ) : (
+                                  "Delete User"
+                                )}
+                              </Button>
+                            </DialogContent>
+                          </Dialog>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
               </Table>
             </CardContent>
           </Card>
