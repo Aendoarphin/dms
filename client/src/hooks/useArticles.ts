@@ -12,7 +12,7 @@ interface Article {
   content: string;
 }
 
-export default function useArticles() {
+export default function useArticles(refresh: boolean) {
   const [articles, setArticles] = useState<
     Article[] | null
   >(null);
@@ -32,7 +32,7 @@ export default function useArticles() {
       }
     }
     fetchArticles();
-  }, []);
+  }, [refresh]);
 
   return articles;
 }

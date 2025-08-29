@@ -44,8 +44,9 @@ export default function Articles() {
     JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
   );
   const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const adminId = useGetAdmin(currentUser);
-  const articles = useArticles();
+  const articles = useArticles(refresh);
 
   const navigate = useNavigate();
 
@@ -155,7 +156,7 @@ export default function Articles() {
     if (error) {
       window.alert("Could not delete article:" + articleId);
     }
-    window.location.reload();
+    setRefresh(!refresh);
   };
 
   return (
@@ -262,7 +263,7 @@ export default function Articles() {
           </div>
 
           {/* Articles Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {allArticles.map((article) => (
               <Card
                 key={article.id}
