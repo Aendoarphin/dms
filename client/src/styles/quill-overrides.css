@@ -15,7 +15,7 @@
 
 div.quill {
   position: relative;
-  z-index: 0
+  z-index: 0;
 }
 
 .ql-container.ql-snow {
@@ -36,4 +36,13 @@ span.ql-picker-item::before {
 
 ol > li {
   list-style: decimal;
+}
+
+#editor-resizer > div.toolbar {
+  border-width: 0px 0px 1px 0px !important;
+  border-color: var(--color-muted-foreground) !important;
+  position: absolute;
+  top: 0;
+  width: max-content;
+  background-color: var(--color-card);
 }

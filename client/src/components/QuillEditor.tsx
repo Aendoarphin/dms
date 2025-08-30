@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 import Quill from "quill";
-//@ts-expect-error: Ignore type decl
-import ImageResize from "quill-image-resize-module-react";
+import ResizeModule from "@botom/quill-resize-module";
+
+Quill.register("modules/resize", ResizeModule);
 
 export default function QuillEditor({
   articleContent,
@@ -20,8 +21,6 @@ export default function QuillEditor({
   articleContent: string;
   setArticleContent: (value: string) => void;
 }) {
-  Quill.register("modules/imageResize", ImageResize);
-
   localStorage.setItem("previewContent", articleContent);
   const toolbarOptions = [
     { header: [1, 2, 3, false] },
@@ -58,9 +57,14 @@ export default function QuillEditor({
           onChange={setArticleContent}
           modules={{
             toolbar: toolbarOptions,
-            imageResize: {
-              parchment: Quill.import("parchment"),
-              modules: ["Resize", "DisplaySize", "Toolbar"],
+            resize: {
+              locale: {
+                altTip: "Hold down the alt key to zoom",
+                floatLeft: "Left",
+                floatRight: "Right",
+                center: "Center",
+                restore: "Restore",
+              },
             },
           }}
         />
