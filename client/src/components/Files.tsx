@@ -4,9 +4,10 @@ import {
   Calendar,
   HardDrive,
   File,
-  Pencil,
   Trash,
   Download,
+  Upload,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,9 +44,21 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { formatFileSize, formatDate, formatDateTime } from "@/util/helper";
+import { toast } from "sonner";
+
+interface FileItem {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  created: string;
+  modified: string;
+  owner: string;
+  category: string;
+}
 
 // Mock file data
-const mockFiles = [
+const mockFiles: FileItem[] = [
   {
     id: "1",
     name: "project-proposal.pdf",
@@ -110,27 +123,76 @@ const mockFiles = [
 
 export default function Files() {
   const [loading, setLoading] = useState(false);
+  const [uploadLoading, setUploadLoading] = useState(false);
   const [categoryValue, setCategoryValue] = useState("all");
   const [sortValue, setSortValue] = useState("name");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size must be less than 10MB");
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) return;
+
+    setUploadLoading(true);
+
+    try {
+      // Simulate upload process
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      toast.success(`File "${selectedFile.name}" uploaded successfully!`);
+      setSelectedFile(null);
+      setUploadDialogOpen(false);
+
+      // Reset file input
+      const fileInput = document.getElementById(
+        "file-upload"
+      ) as HTMLInputElement;
+      if (fileInput) fileInput.value = "";
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast.error("Failed to upload file. Please try again.");
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  const handleCancelUpload = () => {
+    setSelectedFile(null);
+    setUploadDialogOpen(false);
+
+    // Reset file input
+    const fileInput = document.getElementById(
+      "file-upload"
+    ) as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
 
   const handleDeleteFile = async (fileId: string) => {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
       console.log(`Deleting file with ID: ${fileId}`);
+      toast.success("File deleted successfully!");
       setLoading(false);
     }, 1000);
   };
 
   const handleDownloadFile = (fileId: string, fileName: string) => {
     console.log(`Downloading file: ${fileName}`);
+    toast.info(`Downloading ${fileName}...`);
     // Simulate download
-  };
-
-  const handleEditFile = (fileId: string, fileName: string) => {
-    console.log(`Editing file: ${fileName}`);
-    // Navigate to edit page or open edit modal
   };
 
   // Filter files based on search and category
@@ -172,7 +234,7 @@ export default function Files() {
       break;
   }
 
-  const getCategoryCount = (category: string) => {
+  const getCategoryCount = (category: string): number => {
     if (category === "all") return mockFiles.length;
     return mockFiles.filter((file) => file.category === category).length;
   };
@@ -201,7 +263,85 @@ export default function Files() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button>Upload File</Button>
+
+              {/* Upload Dialog */}
+              <Dialog
+                open={uploadDialogOpen}
+                onOpenChange={setUploadDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload File
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Upload File</DialogTitle>
+                    <DialogDescription>
+                      Select a file to upload. Supported formats: PDF, DOC,
+                      DOCX, TXT, CSV, XLS, XLSX
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="space-y-4">
+                    {/* File Drop Zone */}
+                    <div className="flex items-center justify-center w-full">
+                      <label
+                        htmlFor="file-upload"
+                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
+                      >
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Maximum file size: 50MB
+                          </p>
+                        </div>
+                        <Input
+                          id="file-upload"
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
+                          onChange={handleFileSelect}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Selected File Preview */}
+                    {selectedFile && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                            {selectedFile.name}
+                          </span>
+                          <span className="text-xs text-blue-600 dark:text-blue-400">
+                            ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Dialog Actions */}
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline" onClick={handleCancelUpload}>
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleFileUpload}
+                      disabled={!selectedFile || uploadLoading}
+                    >
+                      {uploadLoading ? "Uploading..." : "Upload File"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
@@ -267,7 +407,7 @@ export default function Files() {
             <div className="flex items-center space-x-2">
               <Select
                 defaultValue="name"
-                onValueChange={(e) => setSortValue(e)}
+                onValueChange={(value: string) => setSortValue(value)}
               >
                 <SelectTrigger className="w-[140px] h-8">
                   <SelectValue />
@@ -323,12 +463,6 @@ export default function Files() {
                         <span>Created</span>
                       </div>
                     </TableHead>
-                    <TableHead>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>Modified</span>
-                      </div>
-                    </TableHead>
                     <TableHead>Owner</TableHead>
                     <TableHead>Type</TableHead>
                     <TableHead className="text-center">Actions</TableHead>
@@ -347,7 +481,9 @@ export default function Files() {
                       <TableCell className="text-muted-foreground">
                         {formatDateTime(file.modified)}
                       </TableCell>
-                      <TableCell>{file.owner}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {file.owner}
+                      </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{file.type}</Badge>
                       </TableCell>
@@ -361,15 +497,8 @@ export default function Files() {
                         >
                           <Download strokeWidth={3} />
                         </Button>
-                        <Button
-                          variant="link"
-                          size="sm"
-                          onClick={() => handleEditFile(file.id, file.name)}
-                          className="p-2"
-                          title="Edit File"
-                        >
-                          <Pencil strokeWidth={3} />
-                        </Button>
+
+                        {/* Delete Dialog */}
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button
