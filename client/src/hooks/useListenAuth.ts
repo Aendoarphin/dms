@@ -21,7 +21,7 @@ export default function useListenAuth(signedInTime: string) {
           response.ok
         ) {
           supabase.auth.signOut();
-          localStorage.clear();
+          localStorage.removeItem(import.meta.env.VITE_COOKIE);
           window.alert(
             "Your session has expired due to inactivity. Please log in again."
           );
