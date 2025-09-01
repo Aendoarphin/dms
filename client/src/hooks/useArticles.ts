@@ -1,7 +1,7 @@
 import supabase from "@/util/supabase";
 import { useState, useEffect } from "react";
 
-interface Article {
+export interface Article {
   id: number;
   title: string;
   description: string;
