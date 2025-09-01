@@ -35,7 +35,6 @@ import {
 import { useUsers } from "@/hooks/useUsers";
 import { useAdmins } from "@/hooks/useAdmins";
 import { Link, useNavigate } from "react-router";
-
 import {
   Dialog,
   DialogContent,
@@ -48,17 +47,17 @@ import axios from "axios";
 import { useState } from "react";
 
 export default function Users() {
-
   const [refresh, setRefresh] = useState(false);
-  
   const [currentUser] = useState(
     JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
   );
   const [loading, setLoading] = useState(false);
   const [categoryValue, setCategoryValue] = useState("all");
   const [sortValue, setSortValue] = useState("email");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const navigate = useNavigate();
+
   const { users, error: usersError } = useUsers(refresh);
   const { admins, error: adminsError } = useAdmins();
 
@@ -86,16 +85,57 @@ export default function Users() {
     setLoading(false);
   };
 
-  const allUsers = [
-    ...users.map((user) => ({
-      id: user.id,
-      name: user.user_metadata.firstName + " " + user.user_metadata.lastName,
-      email: user.email,
-      created: user.created_at,
-      lastSignIn: user.last_sign_in_at,
-      role: isAdmin(user.id) ? "Admin" : "User",
-    })),
-  ];
+  const allUsers = users.map((user) => ({
+    id: user.id,
+    name: user.user_metadata.firstName + " " + user.user_metadata.lastName,
+    email: user.email,
+    created: user.created_at,
+    lastSignIn: user.last_sign_in_at,
+    role: isAdmin(user.id) ? "Admin" : "User",
+  }));
+
+  // Filter users based on search and category
+  const filteredUsers = allUsers.filter((user) => {
+    // Search filter
+    const matchesSearch =
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Category filter
+    const matchesCategory =
+      categoryValue === "all" ||
+      (categoryValue === "admins" && user.role === "Admin") ||
+      (categoryValue === "users" && user.role === "User");
+
+    return matchesSearch && matchesCategory;
+  });
+
+  // Sort users
+  switch (sortValue) {
+    case "newest":
+      filteredUsers.sort((a, b) => {
+        return new Date(b.created).getTime() - new Date(a.created).getTime();
+      });
+      break;
+    case "oldest":
+      filteredUsers.sort((a, b) => {
+        return new Date(a.created).getTime() - new Date(b.created).getTime();
+      });
+      break;
+    case "email":
+      filteredUsers.sort((a, b) => {
+        return a.email?.localeCompare(b.email || "") || 0;
+      });
+      break;
+    case "last-signin":
+      filteredUsers.sort((a, b) => {
+        return (
+          new Date(b.lastSignIn as string).getTime() -
+          new Date(a.lastSignIn as string).getTime()
+        );
+      });
+      break;
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -117,19 +157,14 @@ export default function Users() {
     });
   };
 
-  // Error state
-  if (usersError || adminsError) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-4">
-            Error: {usersError || adminsError}
-          </p>
-          <Button onClick={() => window.location.reload()}>Retry</Button>
-        </div>
-      </div>
-    );
-  }
+  const getCategoryCount = (category: string) => {
+    if (category === "all") return allUsers.length;
+    if (category === "admins")
+      return allUsers.filter((u) => u.role === "Admin").length;
+    if (category === "users")
+      return allUsers.filter((u) => u.role === "User").length;
+    return 0;
+  };
 
   const handleEditUser = (
     first: string,
@@ -148,29 +183,18 @@ export default function Users() {
     });
   };
 
-  switch (sortValue) {
-    case "newest":
-      allUsers.sort((a, b) => {
-        return new Date(b.created).getTime() - new Date(a.created).getTime();
-      });
-      break;
-    case "oldest":
-      allUsers.sort((a, b) => {
-        return new Date(a.created).getTime() - new Date(b.created).getTime();
-      });
-      break;
-    case "email":
-      allUsers.sort((a, b) => {
-        return a.email?.localeCompare(b.email || "") || 0;
-      });
-      break;
-    case "last-signin":
-      allUsers.sort((a, b) => {
-        return (
-          new Date(b.lastSignIn as string).getTime() -
-          new Date(a.lastSignIn as string).getTime()
-        );
-      });
+  // Error state
+  if (usersError || adminsError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">
+            Error: {usersError || adminsError}
+          </p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -193,6 +217,8 @@ export default function Users() {
                   type="search"
                   placeholder="Search users..."
                   className="w-full lg:w-[300px] pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <Link to={"new"}>
@@ -212,7 +238,7 @@ export default function Users() {
               >
                 All Users
                 <Badge variant="secondary" className="ml-2">
-                  {allUsers.length}
+                  {getCategoryCount("all")}
                 </Badge>
               </Button>
               <Button
@@ -223,7 +249,7 @@ export default function Users() {
               >
                 Admins
                 <Badge variant="secondary" className="ml-2">
-                  {allUsers.filter((u) => u.role === "Admin").length}
+                  {getCategoryCount("admins")}
                 </Badge>
               </Button>
               <Button
@@ -234,15 +260,12 @@ export default function Users() {
               >
                 Users
                 <Badge variant="secondary" className="ml-2">
-                  {allUsers.filter((u) => u.role === "User").length}
+                  {getCategoryCount("users")}
                 </Badge>
               </Button>
             </div>
             <div className="flex items-center space-x-2">
-              <Select
-                defaultValue="email"
-                onValueChange={(e) => setSortValue(e)}
-              >
+              <Select defaultValue="email" onValueChange={setSortValue}>
                 <SelectTrigger className="w-[140px] h-8">
                   <SelectValue />
                 </SelectTrigger>
@@ -259,7 +282,7 @@ export default function Users() {
           {/* Results Summary */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {allUsers.length} users
+              Showing {filteredUsers.length} users
             </p>
           </div>
 
@@ -308,17 +331,8 @@ export default function Users() {
                 </TableHeader>
 
                 <TableBody>
-                  {allUsers.map((user) => (
-                    <TableRow
-                      key={user.id}
-                      className="hover:bg-muted"
-                      hidden={
-                        categoryValue !== "all" &&
-                        ((categoryValue === "admins" &&
-                          user.role !== "Admin") ||
-                          (categoryValue === "users" && user.role !== "User"))
-                      }
-                    >
+                  {filteredUsers.map((user) => (
+                    <TableRow key={user.id} className="hover:bg-muted">
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell className="font-medium">
                         {user.email}
@@ -335,9 +349,10 @@ export default function Users() {
                             user.role.slice(1)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="flex justify-center">
+                      <TableCell className="flex justify-center space-x-1">
                         <Button
-                          variant={"link"}
+                          variant="link"
+                          size="sm"
                           onClick={() =>
                             handleEditUser(
                               user.name.split(" ")[0],
@@ -347,47 +362,44 @@ export default function Users() {
                               user.id
                             )
                           }
-                          className={"p-0"}
+                          className="p-2"
                           title="Edit User"
                         >
                           <Pencil strokeWidth={3} />
                         </Button>
-                        <Button
-                          variant={"link"}
-                          className={`p-0 ${
-                            user.id === currentUser.user.id ? "hidden" : ""
-                          }`}
-                          title="Delete User"
-                        >
-                          <Dialog modal>
+                        {user.id !== currentUser.user.id && (
+                          <Dialog>
                             <DialogTrigger asChild>
-                              <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
-                                <Trash strokeWidth={3} color="red" />
-                              </div>
+                              <Button
+                                variant="link"
+                                size="sm"
+                                className="p-2 text-destructive hover:text-destructive"
+                                title="Delete User"
+                              >
+                                <Trash strokeWidth={3} />
+                              </Button>
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
                                 <DialogTitle>Confirm User Delete</DialogTitle>
                                 <DialogDescription>
-                                  Do you wish to delete user {user.email}?
+                                  Do you wish to delete user {user.email}? This
+                                  action cannot be undone.
                                 </DialogDescription>
                               </DialogHeader>
-                              <Button
-                                variant="destructive"
-                                onClick={() => handleDeleteUser(user.id)}
-                                type="button"
-                              >
-                                {loading ? (
-                                  <div className="animate-pulse">
-                                    Deleting User...
-                                  </div>
-                                ) : (
-                                  "Delete User"
-                                )}
-                              </Button>
+                              <div className="flex justify-end space-x-2">
+                                <Button variant="outline">Cancel</Button>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  disabled={loading}
+                                >
+                                  {loading ? "Deleting..." : "Delete User"}
+                                </Button>
+                              </div>
                             </DialogContent>
                           </Dialog>
-                        </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

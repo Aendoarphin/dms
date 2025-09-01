@@ -22,10 +22,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useNavigate } from "react-router";
-import { useState } from "react";
-import useArticles from "@/hooks/useArticles";
-import useGetAdmin from "@/hooks/useGetAdmin";
 import {
   Dialog,
   DialogContent,
@@ -34,24 +30,50 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useNavigate } from "react-router";
+import { useState } from "react";
+import useArticles from "@/hooks/useArticles";
+import useGetAdmin from "@/hooks/useGetAdmin";
 import supabase from "@/util/supabase";
+
 export default function Articles() {
-  const [categoryIndex, setCategoryIndex] = useState(0);
   const [categoryValue, setCategoryValue] = useState("all");
-  const [filterValue, setFilterValue] = useState("newest");
+  const [sortValue, setSortValue] = useState("newest");
   const [timeFilterValue, setTimeFilterValue] = useState("all-time");
   const [currentUser] = useState(
     JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
   );
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const adminId = useGetAdmin(currentUser);
   const articles = useArticles(refresh);
 
   const navigate = useNavigate();
 
-  const allArticles = articles
+  // Filter articles based on search, category, and time period
+  const filteredArticles = articles
     ? articles.filter((article) => {
+        // Search filter
+        const matchesSearch =
+          article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          article.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          article.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          article.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          article.tags
+            .join(" ")
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+
+        // Category filter
+        const matchesCategory =
+          categoryValue === "all" ||
+          article.category.toLowerCase() === categoryValue.toLowerCase();
+
+        // Time filter
         const publishDate = new Date(article.publish_date);
         const today = new Date();
         const lastWeek = new Date(
@@ -70,81 +92,54 @@ export default function Articles() {
           today.getDate()
         );
 
+        let matchesTimeFilter = true;
         switch (timeFilterValue) {
-          case "all-time":
-            return true;
           case "last-week":
-            return publishDate >= lastWeek;
+            matchesTimeFilter = publishDate >= lastWeek;
+            break;
           case "last-month":
-            return publishDate >= lastMonth;
+            matchesTimeFilter = publishDate >= lastMonth;
+            break;
           case "last-quarter":
-            return publishDate >= lastQuarter;
+            matchesTimeFilter = publishDate >= lastQuarter;
+            break;
+          case "all-time":
           default:
-            return true;
+            matchesTimeFilter = true;
+            break;
         }
+
+        return matchesSearch && matchesCategory && matchesTimeFilter;
       })
     : [];
 
-  const categories = [
-    {
-      id: 1,
-      value: "all",
-      label: "All Articles",
-      count: allArticles.length,
-    },
-    {
-      id: 2,
-      value: "accounting",
-      label: "Accounting",
-      count: allArticles.filter((a) => a.category === "accounting").length,
-    },
-    {
-      id: 3,
-      value: "compliance",
-      label: "Compliance",
-      count: allArticles.filter((a) => a.category === "compliance").length,
-    },
-    {
-      id: 4,
-      value: "operations",
-      label: "Operations",
-      count: allArticles.filter((a) => a.category === "operations").length,
-    },
-    {
-      id: 5,
-      value: "information technology",
-      label: "Information Technology",
-      count: allArticles.filter((a) => a.category === "information technology")
-        .length,
-    },
-    {
-      id: 6,
-      value: "collections",
-      label: "Collections",
-      count: allArticles.filter((a) => a.category === "collections").length,
-    },
-    {
-      id: 7,
-      value: "other",
-      label: "Other",
-      count: allArticles.filter((a) => a.category === "Other").length,
-    },
-  ];
-
-  switch (filterValue) {
+  // Sort articles
+  switch (sortValue) {
     case "newest":
-      allArticles.sort((a, b) => b.publish_date.localeCompare(a.publish_date));
+      filteredArticles.sort((a, b) =>
+        b.publish_date.localeCompare(a.publish_date)
+      );
       break;
     case "oldest":
-      allArticles.sort((a, b) => a.publish_date.localeCompare(b.publish_date));
+      filteredArticles.sort((a, b) =>
+        a.publish_date.localeCompare(b.publish_date)
+      );
       break;
     case "title":
-      allArticles.sort((a, b) => a.title.localeCompare(b.title));
+      filteredArticles.sort((a, b) => a.title.localeCompare(b.title));
       break;
     case "author":
-      allArticles.sort((a, b) => a.email.localeCompare(b.email));
+      filteredArticles.sort((a, b) => a.email.localeCompare(b.email));
       break;
   }
+
+  const getCategoryCount = (category: string) => {
+    if (!articles) return 0;
+    if (category === "all") return articles.length;
+    return articles.filter(
+      (article) => article.category.toLowerCase() === category.toLowerCase()
+    ).length;
+  };
 
   const handleDeleteArticle = async (articleId: string) => {
     setLoading(true);
@@ -157,6 +152,20 @@ export default function Articles() {
       window.alert("Could not delete article:" + articleId);
     }
     setRefresh(!refresh);
+  };
+
+  // Handle article click - update recently viewed and navigate
+  const handleArticleClick = (articleId: string) => {
+    // Update recently viewed articles in localStorage
+    const stored = localStorage.getItem(currentUser.user.id);
+    const recentlyViewed = stored ? JSON.parse(stored) : [];
+    
+    // Remove article if it exists and add it to the beginning, limit to 20 items
+    const updated = [articleId, ...recentlyViewed.filter((id: string) => id !== articleId)].slice(0, 20);
+    localStorage.setItem(currentUser.user.id, JSON.stringify(updated));
+    
+    // Navigate to article detail page
+    navigate(`/articles/${articleId}`);
   };
 
   return (
@@ -179,6 +188,8 @@ export default function Articles() {
                   type="search"
                   placeholder="Search articles..."
                   className="w-full lg:w-[300px] pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
               <DropdownMenu>
@@ -188,13 +199,42 @@ export default function Articles() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>All Articles</DropdownMenuItem>
-                  <DropdownMenuItem>Accounting</DropdownMenuItem>
-                  <DropdownMenuItem>Compliance</DropdownMenuItem>
-                  <DropdownMenuItem>Operations</DropdownMenuItem>
-                  <DropdownMenuItem>Information Technology</DropdownMenuItem>
-                  <DropdownMenuItem>Collections</DropdownMenuItem>
-                  <DropdownMenuItem>Other</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setCategoryValue("all")}>
+                    All Articles
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCategoryValue("accounting")}
+                  >
+                    Accounting
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCategoryValue("compliance")}
+                  >
+                    Compliance
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCategoryValue("operations")}
+                  >
+                    Operations
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCategoryValue("information technology")}
+                  >
+                    Information Technology
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCategoryValue("collections")}
+                  >
+                    Collections
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => setCategoryValue("human resources")}
+                  >
+                    Human Resources
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setCategoryValue("other")}>
+                    Other
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -203,31 +243,105 @@ export default function Articles() {
           {/* Filter Bar */}
           <div className="flex flex-col p-4 space-y-4 rounded-lg sm:flex-row sm:items-center sm:justify-between sm:space-y-0 bg-card">
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Button
-                  key={category.value}
-                  variant={
-                    categoryIndex === category.id ||
-                    categoryValue.toLowerCase() === category.value
-                      ? "default"
-                      : "outline"
-                  }
-                  onClick={() => {
-                    setCategoryIndex(category.id);
-                    setCategoryValue(category.value);
-                  }}
-                  size="sm"
-                  className="h-8"
-                >
-                  {category.label}
-                  <Badge variant="secondary" className="ml-2">
-                    {category.count}
-                  </Badge>
-                </Button>
-              ))}
+              <Button
+                variant={categoryValue === "all" ? "default" : "outline"}
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("all")}
+              >
+                All
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("all")}
+                </Badge>
+              </Button>
+              <Button
+                variant={categoryValue === "accounting" ? "default" : "outline"}
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("accounting")}
+              >
+                Accounting
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("accounting")}
+                </Badge>
+              </Button>
+              <Button
+                variant={categoryValue === "compliance" ? "default" : "outline"}
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("compliance")}
+              >
+                Compliance
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("compliance")}
+                </Badge>
+              </Button>
+              <Button
+                variant={categoryValue === "operations" ? "default" : "outline"}
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("operations")}
+              >
+                Operations
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("operations")}
+                </Badge>
+              </Button>
+              <Button
+                variant={
+                  categoryValue === "information technology"
+                    ? "default"
+                    : "outline"
+                }
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("information technology")}
+              >
+                Information Technology
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("information technology")}
+                </Badge>
+              </Button>
+              <Button
+                variant={
+                  categoryValue === "collections" ? "default" : "outline"
+                }
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("collections")}
+              >
+                Collections
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("collections")}
+                </Badge>
+              </Button>
+              <Button
+                variant={
+                  categoryValue === "human resources" ? "default" : "outline"
+                }
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("human resources")}
+              >
+                Human Resources
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("human resources")}
+                </Badge>
+              </Button>
+              <Button
+                variant={categoryValue === "other" ? "default" : "outline"}
+                size="sm"
+                className="h-8"
+                onClick={() => setCategoryValue("other")}
+              >
+                Other
+                <Badge variant="secondary" className="ml-2">
+                  {getCategoryCount("other")}
+                </Badge>
+              </Button>
             </div>
             <div className="flex items-center space-x-2">
-              <Select defaultValue={filterValue} onValueChange={setFilterValue}>
+              <Select defaultValue="newest" onValueChange={setSortValue}>
                 <SelectTrigger className="w-[140px] h-8">
                   <SelectValue />
                 </SelectTrigger>
@@ -258,26 +372,21 @@ export default function Articles() {
           {/* Results Summary */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {allArticles.length} articles
+              Showing {filteredArticles.length} articles
             </p>
           </div>
 
           {/* Articles Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-            {allArticles.map((article) => (
+            {filteredArticles.map((article) => (
               <Card
                 key={article.id}
-                className={
-                  article.category.toLowerCase() ===
-                    categoryValue.toLowerCase() ||
-                  categoryValue.toLowerCase() === "all"
-                    ? "hover:shadow-md transition-shadow relative z-1"
-                    : "hidden"
-                }
+                className="hover:shadow-md transition-shadow relative cursor-pointer"
+                onClick={() => handleArticleClick(article.id.toString())}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="">
+                    <Badge variant="outline">
                       {article.category.includes(" ")
                         ? article.category
                             .split(" ")
@@ -290,13 +399,14 @@ export default function Articles() {
                           article.category.slice(1)}
                     </Badge>
                     {currentUser.user.id === adminId && (
-                      <Button
-                        variant={"link"}
-                        className={`p-0`}
-                        title="Delete Article"
-                      >
-                        <Dialog modal>
-                          <DialogTrigger asChild>
+                      <Dialog modal>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="link"
+                            className="p-0"
+                            title="Delete Article"
+                            onClick={(e) => e.stopPropagation()} // Prevent card click
+                          >
                             <div className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md cursor-pointer">
                               <Trash
                                 strokeWidth={3}
@@ -304,38 +414,33 @@ export default function Articles() {
                                 color="red"
                               />
                             </div>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Confirm Article Delete</DialogTitle>
-                              <DialogDescription>
-                                Do you wish to delete this article?
-                              </DialogDescription>
-                            </DialogHeader>
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Confirm Article Delete</DialogTitle>
+                            <DialogDescription>
+                              Do you wish to delete this article? This action
+                              cannot be undone.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="outline">Cancel</Button>
                             <Button
                               variant="destructive"
                               onClick={() =>
                                 handleDeleteArticle(article.id.toString())
                               }
-                              type="button"
+                              disabled={loading}
                             >
-                              {loading ? (
-                                <div className="animate-pulse">
-                                  Deleting Article...
-                                </div>
-                              ) : (
-                                "Delete Article"
-                              )}
+                              {loading ? "Deleting..." : "Delete Article"}
                             </Button>
-                          </DialogContent>
-                        </Dialog>
-                      </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     )}
                   </div>
-                  <CardTitle
-                    className="line-clamp-2 leading-normal cursor-pointer hover:underline"
-                    onClick={() => navigate(`/articles/${article.id}`)}
-                  >
+                  <CardTitle className="line-clamp-2 leading-normal hover:underline">
                     {article.title}
                   </CardTitle>
                   <CardDescription className="line-clamp-3">
