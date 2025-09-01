@@ -10,7 +10,7 @@ import { useSanitizeHtml } from "@/hooks/useSanitizeHtml";
 export default function Article() {
   const navigate = useNavigate();
   const params = useParams();
-  const articles = useArticles();
+  const articles = useArticles(true);
   const article = articles?.find(
     (a) => a.id.toString() === params.id?.toString() || null
   );
