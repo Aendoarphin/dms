@@ -1,6 +1,6 @@
 import { User as UserIcon, Home, BookOpen, Shield, LogOut, Pencil, File } from "lucide-react";
 
-// sidebar items
+// Sidebar items
 export const menuItems = [
 	{
 		title: "Home",
@@ -38,3 +38,8 @@ export const menuItems = [
 		icon: LogOut,
 	},
 ];
+
+export const toasterStyle = {
+	success: { style: { backgroundColor: "green", color: "white" } },
+	error: { style: { backgroundColor: "red", color: "white" } },
+}
