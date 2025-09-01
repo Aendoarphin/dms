@@ -36,11 +36,8 @@ export function AppSidebar() {
 
 	const handleLogout = async () => {
 		await supabase.auth.signOut({ scope: "global" });
-		[window.localStorage, window.sessionStorage].forEach((storage) => {
-			Object.entries(storage).forEach(([key]) => {
-				storage.removeItem(key);
-			});
-		});
+		localStorage.removeItem(import.meta.env.VITE_COOKIE);
+		sessionStorage.clear();
 		navigate("/login", { replace: true });
 	};
 
