@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { toast, Toaster } from "sonner";
 import axios from "axios";
 import supabase from "@/util/supabase";
+import { toasterStyle } from "@/static";
 
 export default function EditUserForm() {
   const navigate = useNavigate();
@@ -117,28 +118,20 @@ export default function EditUserForm() {
         console.log(updatePasswordRes.data.user.id);
 
         if (updatePasswordRes.data.error) {
-          toast.error("Error updating password: " + updatePasswordRes.data.error, {
-            style: { backgroundColor: "red", color: "white" },
-          });
+          toast.error("Error updating password: " + updatePasswordRes.data.error, toasterStyle.error);
           return;
         }
       }
 
-      const timerDuration = 5000;
-
       if (!insertAdminRes?.error || !deleteAdminRes?.error) {
-        toast.success("User updated successfully, redirecting in " + timerDuration / 1000 + " seconds", {
-          style: { backgroundColor: "green", color: "white" },
-          duration: timerDuration,
+        toast.success("User updated successfully", {
+          ...toasterStyle.success,
         });
-        // Wait 5 seconds before redirecting
-        await new Promise((resolve) => setTimeout(resolve, timerDuration));
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         navigate("/users");
       }
     } catch (error) {
-      toast.error("Something went wrong: " + error, {
-        style: { backgroundColor: "red", color: "white" },
-      });
+      toast.error("Something went wrong: " + error, toasterStyle.error);
     } finally {
       setLoading(false);
     }

@@ -10,6 +10,9 @@ import { toast, Toaster } from "sonner";
 import axios from "axios";
 import supabase from "@/util/supabase";
 import { passwordMinLength, passwordPattern, passwordTitle } from "@/global";
+import { toasterStyle } from "@/static";
+
+// This form adds a user like the file name says
 
 export default function AddUserForm() {
   const navigate = useNavigate();
@@ -65,7 +68,7 @@ export default function AddUserForm() {
     // Create the user
     try {
       const createUserRes = await axios.post("https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user", formInput, config);
-      // Inert into admin table if role is admin
+      // Insert user id into admin table if role is admin
       if (formData.role.toLowerCase() === "admin") {
         await supabase.from("administrators").insert({
           user_id: createUserRes.data.user.id,
@@ -88,15 +91,11 @@ export default function AddUserForm() {
         );
 
         if (createUserRes.status === 201) {
-          toast.success("User created successfully", {
-            style: { backgroundColor: "green", color: "white" },
-          });
+          toast.success("User created successfully", toasterStyle.success);
         }
 
         if (setUserMetadataRes.data.error) {
-          toast.error(createUserRes.data.error, {
-            style: { backgroundColor: "red", color: "white" },
-          });
+          toast.error(createUserRes.data.error, toasterStyle.error);
         }
 
         setFormData({
@@ -107,15 +106,11 @@ export default function AddUserForm() {
           role: "",
         });
       } else {
-        toast.error(createUserRes.data.error.code, {
-          style: { backgroundColor: "red", color: "white" },
-        });
+        toast.error(createUserRes.data.error.code, toasterStyle.error);
       }
     } catch (error) {
       console.error(error);
-      toast.error("Email is already in use ", {
-        style: { backgroundColor: "red", color: "white" },
-      });
+      toast.error("Email is already in use ", toasterStyle.error);
     } finally {
       setLoading(false);
     }

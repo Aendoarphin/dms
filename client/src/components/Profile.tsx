@@ -17,6 +17,7 @@ import { SessionContext } from "@/context";
 import supabase from "@/util/supabase";
 import { toast, Toaster } from "sonner";
 import { passwordMinLength, passwordPattern, passwordTitle } from "@/global";
+import { toasterStyle } from "@/static";
 
 export default function Profile() {
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -35,9 +36,7 @@ export default function Profile() {
     });
 
     if (error) {
-      toast.error(error.message, {
-        style: { backgroundColor: "red", color: "white" },
-      });
+      toast.error(error.message, toasterStyle.error);
     } else {
       toast.success("Password updated successfully", {
         style: { backgroundColor: "green", color: "white" },

@@ -23,6 +23,7 @@ import QuillEditor from "@/components/QuillEditor";
 import { SessionContext } from "@/context";
 import supabase from "@/util/supabase";
 import { toast, Toaster } from "sonner";
+import { toasterStyle } from "@/static";
 
 export default function Editor() {
   const currentUser = useContext(SessionContext);
@@ -52,15 +53,11 @@ export default function Editor() {
 
         if (error) {
           console.error("Error publishing article:", error);
-          toast.error(error.message, {
-            style: { backgroundColor: "red", color: "white" },
-          });
+          toast.error(error.message, toasterStyle.error);
           return;
         } else {
           console.log("Article published successfully!");
-          toast.success("Article published successfully!", {
-            style: { backgroundColor: "green", color: "white" },
-          });
+          toast.success("Article published successfully!", toasterStyle.success);
           setTitle("");
           setDescription("");
           setContent("");
@@ -68,9 +65,7 @@ export default function Editor() {
           setCategory("operations");
         }
       } else {
-        toast.error("Could not connect to server", {
-          style: { backgroundColor: "red", color: "white" },
-        });
+        toast.error("Could not connect to server", toasterStyle.error);
       }
     } catch (error) {
       console.error("Error publishing article:", error);

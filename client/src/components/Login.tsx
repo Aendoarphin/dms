@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { toasterStyle } from "@/static";
 import supabase from "@/util/supabase";
 import { Info } from "lucide-react";
 import type React from "react";
@@ -25,7 +26,7 @@ export function Login() {
       password: userCred.password,
     });
     if (error) {
-      toast.error(error.message, { style: { backgroundColor: "red", color: "white" } });
+      toast.error(error.message, toasterStyle.error);
       setUserCred({ email: "", password: "" });
       (document.getElementById("email") as HTMLInputElement).value = "";
       (document.getElementById("password") as HTMLInputElement).value = "";
