@@ -18,7 +18,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -42,100 +41,64 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
-import { formatFileSize, formatDate, formatDateTime } from "@/util/helper";
-import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { formatFileSize, formatDate } from "@/util/helper";
+import { toast, Toaster } from "sonner";
+import { toasterStyle } from "@/static";
+import supabase from "@/util/supabase";
 
 interface FileItem {
   id: string;
   name: string;
-  type: string;
   size: number;
   created: string;
-  modified: string;
-  owner: string;
-  category: string;
 }
-
-// Mock file data
-const mockFiles: FileItem[] = [
-  {
-    id: "1",
-    name: "project-proposal.pdf",
-    type: "PDF",
-    size: 2048576, // 2MB in bytes
-    created: "2024-01-15T10:30:00Z",
-    modified: "2024-01-20T14:45:00Z",
-    owner: "John Doe",
-    category: "document",
-  },
-  {
-    id: "2",
-    name: "dashboard-mockup.figma",
-    type: "Design",
-    size: 15728640, // 15MB in bytes
-    created: "2024-01-10T09:15:00Z",
-    modified: "2024-01-25T16:20:00Z",
-    owner: "Sarah Wilson",
-    category: "design",
-  },
-  {
-    id: "3",
-    name: "user-analytics.xlsx",
-    type: "Spreadsheet",
-    size: 512000, // 500KB in bytes
-    created: "2024-01-05T11:00:00Z",
-    modified: "2024-01-22T13:30:00Z",
-    owner: "Mike Johnson",
-    category: "data",
-  },
-  {
-    id: "4",
-    name: "app-screenshot.png",
-    type: "Image",
-    size: 1024000, // 1MB in bytes
-    created: "2024-01-12T15:45:00Z",
-    modified: "2024-01-18T10:15:00Z",
-    owner: "Emily Chen",
-    category: "image",
-  },
-  {
-    id: "5",
-    name: "meeting-recording.mp4",
-    type: "Video",
-    size: 104857600, // 100MB in bytes
-    created: "2024-01-08T14:00:00Z",
-    modified: "2024-01-08T14:00:00Z",
-    owner: "David Brown",
-    category: "media",
-  },
-  {
-    id: "6",
-    name: "api-documentation.md",
-    type: "Markdown",
-    size: 25600, // 25KB in bytes
-    created: "2024-01-20T08:30:00Z",
-    modified: "2024-01-24T17:45:00Z",
-    owner: "Alex Rodriguez",
-    category: "document",
-  },
-];
 
 export default function Files() {
   const [loading, setLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
-  const [categoryValue, setCategoryValue] = useState("all");
   const [sortValue, setSortValue] = useState("name");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [files, setFiles] = useState<FileItem[]>([]);
+  const [filesLoading, setFilesLoading] = useState(true);
+
+  // Fetch files when component mounts or refresh changes
+  useEffect(() => {
+    const fetchFiles = async () => {
+      setFilesLoading(true);
+      try {
+        const allDocs = await supabase.storage.from("documents").list();
+        console.log(allDocs.data);
+
+        if (allDocs.data) {
+          const allFiles: FileItem[] = allDocs.data.map((file) => ({
+            id: file.name,
+            name: file.name,
+            size: file.metadata?.size || 0,
+            created: file.created_at,
+          }));
+          setFiles(allFiles);
+        }
+      } catch (error) {
+        console.error("Error fetching files:", error);
+        toast.error("Failed to fetch files");
+      } finally {
+        setFilesLoading(false);
+      }
+    };
+
+    fetchFiles();
+  }, [refresh]); // Re-run when refresh changes
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Check file size (10MB limit)
       if (file.size > 10 * 1024 * 1024) {
-        toast.error("File size must be less than 10MB");
+        toast.error("File size must be less than 50MB", toasterStyle.error);
         return;
       }
       setSelectedFile(file);
@@ -146,12 +109,21 @@ export default function Files() {
     if (!selectedFile) return;
 
     setUploadLoading(true);
-
     try {
-      // Simulate upload process
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Store the file in storage
+      const { error } = await supabase.storage
+        .from("documents")
+        .upload(selectedFile.name, selectedFile);
 
-      toast.success(`File "${selectedFile.name}" uploaded successfully!`);
+      if (error) {
+        console.error("Error uploading file:", error);
+        toast.error(
+          "Failed to upload file. Please try again.",
+          toasterStyle.error
+        );
+        return;
+      }
+
       setSelectedFile(null);
       setUploadDialogOpen(false);
 
@@ -160,9 +132,20 @@ export default function Files() {
         "file-upload"
       ) as HTMLInputElement;
       if (fileInput) fileInput.value = "";
+
+      toast.success(
+        `File "${selectedFile.name}" uploaded successfully!`,
+        toasterStyle.success
+      );
+
+      // Trigger re-render by toggling refresh state
+      setRefresh((prev) => !prev);
     } catch (error) {
       console.error("Error uploading file:", error);
-      toast.error("Failed to upload file. Please try again.");
+      toast.error(
+        "Failed to upload file. Please try again.",
+        toasterStyle.error
+      );
     } finally {
       setUploadLoading(false);
     }
@@ -171,7 +154,6 @@ export default function Files() {
   const handleCancelUpload = () => {
     setSelectedFile(null);
     setUploadDialogOpen(false);
-
     // Reset file input
     const fileInput = document.getElementById(
       "file-upload"
@@ -181,28 +163,63 @@ export default function Files() {
 
   const handleDeleteFile = async (fileId: string) => {
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      console.log(`Deleting file with ID: ${fileId}`);
+    try {
+      const { error } = await supabase.storage
+        .from("documents")
+        .remove([fileId]);
+
+      if (error) {
+        console.error("Error deleting file:", error);
+        toast.error("Failed to delete file", toasterStyle.error);
+        return;
+      }
+
       toast.success("File deleted successfully!");
+      // Trigger re-render by toggling refresh state
+      setRefresh((prev) => !prev);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      toast.error("Failed to delete file", toasterStyle.error);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleDownloadFile = (fileId: string, fileName: string) => {
-    console.log(`Downloading file: ${fileName}`);
-    toast.info(`Downloading ${fileName}...`);
-    // Simulate download
+  const handleDownloadFile = async (fileId: string, fileName: string) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("documents")
+        .download(fileId);
+
+      if (error) {
+        console.error("Error downloading file:", error);
+        toast.error("Failed to download file", toasterStyle.error);
+        return;
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast.info(`Downloading ${fileName}...`);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      toast.error("Failed to download file", toasterStyle.error);
+    }
   };
 
   // Filter files based on search and category
-  const filteredFiles = mockFiles.filter((file) => {
-    const matchesSearch =
-      file.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      file.owner.toLowerCase().includes(searchQuery.toLowerCase());
-
-    if (categoryValue === "all") return matchesSearch;
-    return matchesSearch && file.category === categoryValue;
+  const filteredFiles = files.filter((file) => {
+    const matchesSearch = file.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    return matchesSearch;
   });
 
   // Sort files
@@ -227,20 +244,11 @@ export default function Files() {
         return b.size - a.size;
       });
       break;
-    case "modified":
-      filteredFiles.sort((a, b) => {
-        return new Date(b.modified).getTime() - new Date(a.modified).getTime();
-      });
-      break;
   }
-
-  const getCategoryCount = (category: string): number => {
-    if (category === "all") return mockFiles.length;
-    return mockFiles.filter((file) => file.category === category).length;
-  };
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster duration={5000} position="bottom-right" />
       {/* Main Content */}
       <div className="p-6 lg:p-8">
         <div className="flex flex-col space-y-6 max-w-full mx-auto">
@@ -263,7 +271,6 @@ export default function Files() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-
               {/* Upload Dialog */}
               <Dialog
                 open={uploadDialogOpen}
@@ -283,7 +290,6 @@ export default function Files() {
                       DOCX, TXT, CSV, XLS, XLSX
                     </DialogDescription>
                   </DialogHeader>
-
                   <div className="space-y-4">
                     {/* File Drop Zone */}
                     <div className="flex items-center justify-center w-full">
@@ -311,7 +317,6 @@ export default function Files() {
                         />
                       </label>
                     </div>
-
                     {/* Selected File Preview */}
                     {selectedFile && (
                       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
@@ -327,7 +332,6 @@ export default function Files() {
                       </div>
                     )}
                   </div>
-
                   {/* Dialog Actions */}
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" onClick={handleCancelUpload}>
@@ -346,64 +350,7 @@ export default function Files() {
           </div>
 
           {/* Filter Bar */}
-          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 p-4 bg-card rounded-lg">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={categoryValue === "all" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("all")}
-              >
-                All Files
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("all")}
-                </Badge>
-              </Button>
-              <Button
-                variant={categoryValue === "document" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("document")}
-              >
-                Documents
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("document")}
-                </Badge>
-              </Button>
-              <Button
-                variant={categoryValue === "image" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("image")}
-              >
-                Images
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("image")}
-                </Badge>
-              </Button>
-              <Button
-                variant={categoryValue === "design" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("design")}
-              >
-                Design
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("design")}
-                </Badge>
-              </Button>
-              <Button
-                variant={categoryValue === "data" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("data")}
-              >
-                Data
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("data")}
-                </Badge>
-              </Button>
-            </div>
+          <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-end sm:space-y-0 p-4 bg-card rounded-lg">
             <div className="flex items-center space-x-2">
               <Select
                 defaultValue="name"
@@ -417,7 +364,6 @@ export default function Files() {
                   <SelectItem value="oldest">Oldest First</SelectItem>
                   <SelectItem value="name">Name A-Z</SelectItem>
                   <SelectItem value="size">Size (Large)</SelectItem>
-                  <SelectItem value="modified">Last Modified</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -426,7 +372,9 @@ export default function Files() {
           {/* Results Summary */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing {filteredFiles.length} files
+              {filesLoading
+                ? "Loading files..."
+                : `Showing ${filteredFiles.length} files`}
             </p>
           </div>
 
@@ -442,99 +390,99 @@ export default function Files() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[300px]">
-                      <div className="flex items-center space-x-2">
-                        <File className="h-4 w-4" />
-                        <span>Name</span>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center space-x-2">
-                        <HardDrive className="h-4 w-4" />
-                        <span>Size</span>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>Created</span>
-                      </div>
-                    </TableHead>
-                    <TableHead>Owner</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredFiles.map((file) => (
-                    <TableRow key={file.id} className="hover:bg-muted">
-                      <TableCell className="font-medium">{file.name}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatFileSize(file.size)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDate(file.created)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDateTime(file.modified)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {file.owner}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{file.type}</Badge>
-                      </TableCell>
-                      <TableCell className="flex justify-center space-x-1">
-                        <Button
-                          variant="link"
-                          size="sm"
-                          onClick={() => handleDownloadFile(file.id, file.name)}
-                          className="p-2"
-                          title="Download File"
-                        >
-                          <Download strokeWidth={3} />
-                        </Button>
-
-                        {/* Delete Dialog */}
-                        <Dialog>
-                          <DialogTrigger asChild>
+              {filesLoading ? (
+                <div className="flex items-center justify-center p-8">
+                  <p className="text-muted-foreground">Loading files...</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[300px]">
+                        <div className="flex items-center space-x-2">
+                          <File className="h-4 w-4" />
+                          <span>Name</span>
+                        </div>
+                      </TableHead>
+                      <TableHead>
+                        <div className="flex items-center space-x-2">
+                          <HardDrive className="h-4 w-4" />
+                          <span>Size</span>
+                        </div>
+                      </TableHead>
+                      <TableHead>
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="h-4 w-4" />
+                          <span>Created</span>
+                        </div>
+                      </TableHead>
+                      <TableHead className="text-center">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredFiles.map((file) =>
+                      file.name.includes("emptyFolder") ? null : (
+                        <TableRow key={file.id} className="hover:bg-muted">
+                          <TableCell className="font-medium">
+                            {file.name}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {formatFileSize(file.size)}
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {formatDate(file.created)}
+                          </TableCell>
+                          <TableCell className="flex justify-center space-x-1">
                             <Button
                               variant="link"
                               size="sm"
-                              className="p-2 text-destructive hover:text-destructive"
-                              title="Delete File"
+                              onClick={() =>
+                                handleDownloadFile(file.id, file.name)
+                              }
+                              className="p-2"
+                              title="Download File"
                             >
-                              <Trash strokeWidth={3} />
+                              <Download strokeWidth={3} />
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Confirm File Delete</DialogTitle>
-                              <DialogDescription>
-                                Do you wish to delete the file "{file.name}"?
-                                This action cannot be undone.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="flex justify-end space-x-2">
-                              <Button variant="outline">Cancel</Button>
-                              <Button
-                                variant="destructive"
-                                onClick={() => handleDeleteFile(file.id)}
-                                disabled={loading}
-                              >
-                                {loading ? "Deleting..." : "Delete File"}
-                              </Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                            {/* Delete Dialog */}
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="link"
+                                  size="sm"
+                                  className="p-2 text-destructive hover:text-destructive"
+                                  title="Delete File"
+                                >
+                                  <Trash strokeWidth={3} />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Confirm File Delete</DialogTitle>
+                                  <DialogDescription>
+                                    Do you wish to delete the file "{file.name}
+                                    "? This action cannot be undone.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="flex justify-end space-x-2">
+                                  <Button variant="outline">Cancel</Button>
+                                  <Button
+                                    variant="destructive"
+                                    onClick={() => handleDeleteFile(file.id)}
+                                    disabled={loading}
+                                  >
+                                    {loading ? "Deleting..." : "Delete File"}
+                                  </Button>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </div>
