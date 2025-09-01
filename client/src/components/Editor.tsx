@@ -110,7 +110,7 @@ export default function Editor() {
             <div>
               <h1 className="text-2xl font-bold">Article Editor</h1>
               <p className="text-muted-foreground">
-                Create and publish your article
+                Create and publish an article
               </p>
             </div>
           </div>
@@ -144,7 +144,7 @@ export default function Editor() {
                     <CardTitle>Article Details</CardTitle>
                   </div>
                   <CardDescription>
-                    Basic information about your article
+                    Basic information about an article
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -163,7 +163,7 @@ export default function Editor() {
                     <Label htmlFor="description">Description</Label>
                     <Textarea
                       id="description"
-                      placeholder="Brief description of your article..."
+                      placeholder="Explain what the article is about..."
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={3}
@@ -189,12 +189,12 @@ export default function Editor() {
                     <CardTitle>Category</CardTitle>
                   </div>
                   <CardDescription>
-                    Specify the category to which your article belongs
+                    Specify the category to which the article belongs
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Select defaultValue={category} onValueChange={setCategory}>
+                    <Select value={category} onValueChange={setCategory}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -207,6 +207,9 @@ export default function Editor() {
                         </SelectItem>
                         <SelectItem value="human resources">
                           Human Resources
+                        </SelectItem>
+                        <SelectItem value="other">
+                          Other
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -233,7 +236,7 @@ export default function Editor() {
                     <CardTitle>Tags</CardTitle>
                   </div>
                   <CardDescription>
-                    Add tags to help categorize your article
+                    Add tags to help categorize the article
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">

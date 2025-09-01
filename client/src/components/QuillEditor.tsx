@@ -46,14 +46,14 @@ export default function QuillEditor({
           <FileText className="h-5 w-5" />
           <CardTitle>Editor</CardTitle>
         </div>
-        <CardDescription>The main content of your article</CardDescription>
+        <CardDescription>The main content of the article</CardDescription>
       </CardHeader>
       <CardContent>
         <ReactQuill
           className="border border-muted-foreground rounded-md max-h-[420px] overflow-y-auto"
           theme="snow"
           value={articleContent}
-          placeholder="Write your article content here..."
+          placeholder="Write the article content here..."
           onChange={setArticleContent}
           modules={{
             toolbar: toolbarOptions,
