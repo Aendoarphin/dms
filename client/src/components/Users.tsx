@@ -45,6 +45,8 @@ import {
 } from "@/components/ui/dialog";
 import axios from "axios";
 import { useState } from "react";
+import { toast, Toaster } from "sonner";
+import { toasterStyle } from "@/static";
 
 export default function Users() {
   const [refresh, setRefresh] = useState(false);
@@ -80,7 +82,10 @@ export default function Users() {
       }
     );
     if (response.status === 200) {
-      setRefresh(!refresh);
+      setRefresh((prev) => !prev);
+      toast.success("User deleted successfully!", toasterStyle.success);
+    } else {
+      toast.error("Failed to delete user", toasterStyle.error);
     }
     setLoading(false);
   };
@@ -199,6 +204,7 @@ export default function Users() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Toaster duration={5000} position="bottom-right" />
       {/* Main Content */}
       <div className="p-6 lg:p-8">
         <div className="flex flex-col space-y-6 max-w-full mx-auto">
