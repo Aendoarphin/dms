@@ -159,11 +159,14 @@ export default function Articles() {
     // Update recently viewed articles in localStorage
     const stored = localStorage.getItem(currentUser.user.id);
     const recentlyViewed = stored ? JSON.parse(stored) : [];
-    
+
     // Remove article if it exists and add it to the beginning, limit to 20 items
-    const updated = [articleId, ...recentlyViewed.filter((id: string) => id !== articleId)].slice(0, 20);
+    const updated = [
+      articleId,
+      ...recentlyViewed.filter((id: string) => id !== articleId),
+    ].slice(0, 20);
     localStorage.setItem(currentUser.user.id, JSON.stringify(updated));
-    
+
     // Navigate to article detail page
     navigate(`/articles/${articleId}`);
   };
@@ -382,7 +385,6 @@ export default function Articles() {
               <Card
                 key={article.id}
                 className="hover:shadow-md transition-shadow relative cursor-pointer"
-                onClick={() => handleArticleClick(article.id.toString())}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -440,7 +442,10 @@ export default function Articles() {
                       </Dialog>
                     )}
                   </div>
-                  <CardTitle className="line-clamp-2 leading-normal hover:underline">
+                  <CardTitle
+                    className="line-clamp-2 leading-normal hover:underline"
+                    onClick={() => handleArticleClick(article.id.toString())}
+                  >
                     {article.title}
                   </CardTitle>
                   <CardDescription className="line-clamp-3">
