@@ -110,10 +110,6 @@
   --sidebar-ring: oklch(0.646 0.222 41.116);
 }
 
-button, a {
-  @apply cursor-pointer;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;

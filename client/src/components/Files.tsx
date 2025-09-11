@@ -46,6 +46,8 @@ import { formatFileSize, formatDate } from "@/util/helper";
 import { toast, Toaster } from "sonner";
 import { toasterStyle } from "@/static";
 import supabase from "@/util/supabase";
+import Loader from "./Loader";
+import NoContent from "./NoContent";
 
 interface FileItem {
   id: string;
@@ -116,9 +118,9 @@ export default function Files() {
         .upload(selectedFile.name, selectedFile);
 
       if (error) {
-        console.error("Error uploading file:", error);
+        console.error("Error uploading file:", error.message);
         toast.error(
-          "Failed to upload file. Please try again.",
+          error.message || "Failed to upload file",
           toasterStyle.error
         );
         return;
@@ -139,13 +141,10 @@ export default function Files() {
       );
 
       // Trigger re-render by toggling refresh state
-      setRefresh((prev) => !prev);
+      setRefresh(!refresh);
     } catch (error) {
       console.error("Error uploading file:", error);
-      toast.error(
-        "Failed to upload file. Please try again.",
-        toasterStyle.error
-      );
+      toast.error("Server error. Please try again later.", toasterStyle.error);
     } finally {
       setUploadLoading(false);
     }
@@ -374,7 +373,7 @@ export default function Files() {
             <p className="text-sm text-muted-foreground">
               {filesLoading
                 ? "Loading files..."
-                : `Showing ${filteredFiles.length} files`}
+                : `Showing ${filteredFiles.length - 1} files`}
             </p>
           </div>
 
@@ -391,9 +390,7 @@ export default function Files() {
             </CardHeader>
             <CardContent>
               {filesLoading ? (
-                <div className="flex items-center justify-center p-8">
-                  <p className="text-muted-foreground">Loading files...</p>
-                </div>
+                <Loader />
               ) : (
                 <Table>
                   <TableHeader>
@@ -483,6 +480,8 @@ export default function Files() {
                   </TableBody>
                 </Table>
               )}
+              {filteredFiles.find((file) => file.size === 0)?.name ===
+                "emptyFolder" && <NoContent />}
             </CardContent>
           </Card>
         </div>

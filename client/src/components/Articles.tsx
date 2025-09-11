@@ -35,6 +35,7 @@ import { useState } from "react";
 import useArticles from "@/hooks/useArticles";
 import useGetAdmin from "@/hooks/useGetAdmin";
 import supabase from "@/util/supabase";
+import Loader from "./Loader";
 
 export default function Articles() {
   const [categoryValue, setCategoryValue] = useState("all");
@@ -479,6 +480,7 @@ export default function Articles() {
               </Card>
             ))}
           </div>
+          {filteredArticles.length === 0 ? <Loader /> : null}
         </div>
       </div>
     </div>
