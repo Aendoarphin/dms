@@ -1,12 +1,25 @@
 import { Search, Clock, Filter, User, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
 import useArticles from "@/hooks/useArticles";
+import Loader from "./Loader";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,7 +27,7 @@ export default function Home() {
   const [refresh] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
   const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
+    JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || "")
   );
 
   const articles = useArticles(refresh);
@@ -33,7 +46,7 @@ export default function Home() {
     if (!articles) return [];
 
     // Get articles that have been recently viewed
-    const viewedArticles = articles.filter(article => 
+    const viewedArticles = articles.filter((article) =>
       recentlyViewed.includes(article.id.toString())
     );
 
@@ -47,10 +60,15 @@ export default function Home() {
     // Apply search filter
     let filtered = viewedArticles;
     if (searchQuery) {
-      filtered = viewedArticles.filter(article =>
-        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        article.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      filtered = viewedArticles.filter(
+        (article) =>
+          article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          article.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          article.tags.some((tag) =>
+            tag.toLowerCase().includes(searchQuery.toLowerCase())
+          )
       );
     }
 
@@ -72,58 +90,73 @@ export default function Home() {
     return filtered;
   }, [articles, recentlyViewed, searchQuery, sortValue]);
 
-
-
   const handleArticleClick = (articleId: string) => {
     // Update recently viewed list
-    const updated = [articleId, ...recentlyViewed.filter(id => id !== articleId)].slice(0, 20);
+    const updated = [
+      articleId,
+      ...recentlyViewed.filter((id) => id !== articleId),
+    ].slice(0, 20);
     setRecentlyViewed(updated);
     localStorage.setItem(currentUser.user.id, JSON.stringify(updated));
-    
+
     navigate(`/articles/${articleId}`);
   };
 
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+    const diffInHours = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+    );
+
     if (diffInHours < 1) return "Just now";
-    if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
-    
+    if (diffInHours < 24)
+      return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
+
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
-    
+    if (diffInDays < 7)
+      return `${diffInDays} day${diffInDays !== 1 ? "s" : ""} ago`;
+
     const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4) return `${diffInWeeks} week${diffInWeeks !== 1 ? 's' : ''} ago`;
-    
+    if (diffInWeeks < 4)
+      return `${diffInWeeks} week${diffInWeeks !== 1 ? "s" : ""} ago`;
+
     return date.toLocaleDateString();
   };
 
   const formatCategory = (category: string) => {
     return category
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
+
+  if (!articles)
+    return (
+      <div className="place-content-center h-full border">
+        <Loader />
+      </div>
+    );
 
   return (
     <div className="flex min-h-screen bg-background">
       {/* Main Content */}
       <div className="flex-1 p-6 md:p-8">
-        <div className="flex flex-col space-y-6 mx-auto">
+        <div className="flex flex-col space-y-6 mx-auto h-full">
           {/* Header */}
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>
               <h1 className="text-2xl font-bold">Dashboard</h1>
-              <p className="text-muted-foreground">Quick access to your recently viewed articles</p>
+              <p className="text-muted-foreground">
+                Quick access to your recently viewed articles
+              </p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  type="search" 
-                  placeholder="Search articles..." 
+                <Input
+                  type="search"
+                  placeholder="Search articles..."
                   className="w-full md:w-[300px] pl-8"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -139,7 +172,9 @@ export default function Home() {
                   <DropdownMenuItem onClick={() => setSortValue("recent")}>
                     Most Recent
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortValue("alphabetical")}>
+                  <DropdownMenuItem
+                    onClick={() => setSortValue("alphabetical")}
+                  >
                     Alphabetical
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setSortValue("category")}>
@@ -151,16 +186,20 @@ export default function Home() {
           </div>
 
           {/* Recently Viewed Section */}
-          <div className="space-y-4">
+          <div className="space-y-4 h-full border">
             <div className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-muted-foreground" />
-              <h2 className="text-lg font-semibold">Recently Viewed Articles ({recentArticles.length})</h2>
+              <h2 className="text-lg font-semibold">
+                Recently Viewed Articles ({recentArticles.length})
+              </h2>
             </div>
-            
+
             {recentArticles.length === 0 ? (
-              <div className="flex h-40 items-center justify-center rounded-md border border-dashed">
+              <div className="fixed rounded-md place-content-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <div className="text-center">
-                  <p className="text-sm text-muted-foreground">No recently viewed articles</p>
+                  <p className="text-sm text-muted-foreground">
+                    No recently viewed articles
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Start browsing articles to see them here
                   </p>
@@ -169,11 +208,16 @@ export default function Home() {
             ) : (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {recentArticles.map((article) => (
-                  <Card key={article.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                  <Card
+                    key={article.id}
+                    className="hover:shadow-md transition-shadow cursor-pointer"
+                  >
                     <CardHeader>
-                      <CardTitle 
+                      <CardTitle
                         className="line-clamp-2 overflow-ellipsis leading-normal hover:underline"
-                        onClick={() => handleArticleClick(article.id.toString())}
+                        onClick={() =>
+                          handleArticleClick(article.id.toString())
+                        }
                       >
                         {article.title}
                       </CardTitle>
@@ -203,7 +247,11 @@ export default function Home() {
                       </Badge>
                       <div className="flex flex-wrap gap-1">
                         {article.tags.slice(0, 3).map((tag, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
+                          <Badge
+                            key={i}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             {tag}
                           </Badge>
                         ))}

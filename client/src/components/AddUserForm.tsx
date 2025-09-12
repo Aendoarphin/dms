@@ -67,7 +67,7 @@ export default function AddUserForm() {
 
     // Create the user
     try {
-      const createUserRes = await axios.post("https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user", formInput, config);
+      const createUserRes = await axios.post(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/user`, formInput, config);
       // Insert user id into admin table if role is admin
       if (formData.role.toLowerCase() === "admin") {
         await supabase.from("administrators").insert({
@@ -79,7 +79,7 @@ export default function AddUserForm() {
       // Set user metadata
       if (createUserRes.status === 201 && createUserRes.data.user) {
         const setUserMetadataRes = await axios.put(
-          `https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${createUserRes.data.user.id}`,
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/user/${createUserRes.data.user.id}`,
           {
             user_metadata: {
               firstName: formData.firstName,

@@ -47,11 +47,12 @@ import axios from "axios";
 import { useState } from "react";
 import { toast, Toaster } from "sonner";
 import { toasterStyle } from "@/static";
+import Loader from "./Loader";
 
 export default function Users() {
   const [refresh, setRefresh] = useState(false);
   const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
+    JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || "")
   );
   const [loading, setLoading] = useState(false);
   const [categoryValue, setCategoryValue] = useState("all");
@@ -62,6 +63,29 @@ export default function Users() {
 
   const { users, error: usersError } = useUsers(refresh);
   const { admins, error: adminsError } = useAdmins();
+
+  // Show loader if users or admins data is not loaded yet
+  if (!users || !admins) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+
+  // Error state
+  if (usersError || adminsError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-destructive mb-4">
+            Error: {usersError || adminsError}
+          </p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   const isAdmin = (userId: string) => {
     return admins?.some((admin) => admin.user_id === userId);
@@ -75,7 +99,7 @@ export default function Users() {
   const handleDeleteUser = async (userId: string) => {
     setLoading(true);
     const response = await axios.delete(
-      "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/user`,
       {
         data: { id: userId },
         headers,
@@ -188,21 +212,11 @@ export default function Users() {
     });
   };
 
-  // Error state
-  if (usersError || adminsError) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive mb-4">
-            Error: {usersError || adminsError}
-          </p>
-          <Button onClick={() => window.location.reload()}>Retry</Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
+  return allUsers.length === 0 ? (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <Loader />
+    </div>
+  ) : (
     <div className="min-h-screen bg-background">
       <Toaster duration={5000} position="bottom-right" />
       {/* Main Content */}

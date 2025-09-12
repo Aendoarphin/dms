@@ -16,12 +16,12 @@ export default function useListenAuth(signedInTime: string) {
         const timeDiff = (currentTime - signedInTimestamp) / 1000 / 60;
         if (
           // User was inactive beyond session time
-          timeDiff > import.meta.env.VITE_SESSION_DURATION &&
-          localStorage.getItem(import.meta.env.VITE_COOKIE) &&
+          timeDiff > import.meta.env.VITE_SESSION_DURATION_IN_MINUTES &&
+          localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) &&
           response.ok
         ) {
           supabase.auth.signOut();
-          localStorage.removeItem(import.meta.env.VITE_COOKIE);
+          localStorage.removeItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`);
           window.alert(
             "Your session has expired due to inactivity. Please log in again."
           );

@@ -42,7 +42,7 @@ export default function Articles() {
   const [sortValue, setSortValue] = useState("newest");
   const [timeFilterValue, setTimeFilterValue] = useState("all-time");
   const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "")
+    JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || "")
   );
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -171,6 +171,13 @@ export default function Articles() {
     // Navigate to article detail page
     navigate(`/articles/${articleId}`);
   };
+
+  if (!articles)
+    return (
+      <div className="place-content-center h-full border">
+        <Loader />
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-background">
@@ -480,7 +487,6 @@ export default function Articles() {
               </Card>
             ))}
           </div>
-          {filteredArticles.length === 0 ? <Loader /> : null}
         </div>
       </div>
     </div>

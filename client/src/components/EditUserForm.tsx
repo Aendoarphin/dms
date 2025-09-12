@@ -92,7 +92,7 @@ export default function EditUserForm() {
         inputBody.user_metadata.role = formData.role;
       }
 
-      const editUserRes = await axios.put(`https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${searchParams.get("id")}`, inputBody, config);
+      const editUserRes = await axios.put(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/user/${searchParams.get("id")}`, inputBody, config);
 
       let insertAdminRes = null;
       let deleteAdminRes = null;
@@ -113,7 +113,7 @@ export default function EditUserForm() {
 
       // If a new password was provided, update the user's password
       if (formData.password !== "") {
-        const updatePasswordRes = await axios.put(`https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user/${searchParams.get("id")}`, { password: formData.password }, config);
+        const updatePasswordRes = await axios.put(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/user/${searchParams.get("id")}`, { password: formData.password }, config);
 
         console.log(updatePasswordRes.data.user.id);
 

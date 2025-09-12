@@ -10,7 +10,7 @@ export const useUsers = (refresh: boolean) => {
     try {
       setError(null);
       const response = await axios.get(
-        "https://gxjoufckpcmbdieviauq.supabase.co/functions/v1/user",
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/user`,
         {
           headers: {
             "Content-Type": "application/json",

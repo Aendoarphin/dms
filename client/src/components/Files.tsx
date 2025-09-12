@@ -245,6 +245,14 @@ export default function Files() {
       break;
   }
 
+  if (filesLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Toaster duration={5000} position="bottom-right" />
@@ -389,9 +397,7 @@ export default function Files() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {filesLoading ? (
-                <Loader />
-              ) : (
+              {
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -479,9 +485,11 @@ export default function Files() {
                     )}
                   </TableBody>
                 </Table>
-              )}
-              {filteredFiles.find((file) => file.size === 0)?.name ===
-                "emptyFolder" && <NoContent />}
+              }
+              {filteredFiles.length === 1 &&
+              filteredFiles[0]?.name.includes("emptyFolder") ? (
+                <NoContent />
+              ) : null}
             </CardContent>
           </Card>
         </div>

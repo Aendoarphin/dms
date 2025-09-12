@@ -25,7 +25,7 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [emailConfirmationDAte] = useState<string | null>(
-    JSON.parse(localStorage.getItem(import.meta.env.VITE_COOKIE) || "").user
+    JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || "").user
       .email_confirmed_at
   );
 

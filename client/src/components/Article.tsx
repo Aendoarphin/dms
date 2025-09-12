@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useNavigate, useParams } from "react-router";
 import useArticles from "@/hooks/useArticles";
 import { useSanitizeHtml } from "@/hooks/useSanitizeHtml";
+import Loader from "./Loader";
 
 export default function Article() {
   const navigate = useNavigate();
@@ -14,6 +15,15 @@ export default function Article() {
   const article = articles?.find(
     (a) => a.id.toString() === params.id?.toString() || null
   );
+
+  const sanitizedContent = useSanitizeHtml(article?.content || "");
+
+  if (!article)
+    return (
+      <div className="place-content-center h-full border">
+        <Loader />
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,7 +99,7 @@ export default function Article() {
                 <div
                   className="whitespace-pre-wrap text-sm leading-relaxed ql-editor"
                   dangerouslySetInnerHTML={{
-                    __html: useSanitizeHtml(article?.content || ""),
+                    __html: sanitizedContent,
                   }}
                 ></div>
               </div>
