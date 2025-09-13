@@ -48,7 +48,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-nowrap flex items-center gap-2 flex-row">
-            <img src="/companylogo.svg" className="max-w-1/8" alt="Logo" />{" "}
+            <img src="/companylogo.svg" className="max-w-4" alt="Logo" />{" "}
             <p>{companyName}</p>
           </SidebarGroupLabel>
           <SidebarGroupContent>

@@ -195,7 +195,7 @@ export default function Home() {
             </div>
 
             {recentArticles.length === 0 ? (
-              <div className="fixed rounded-md place-content-center top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <div className="content-center min-h-9/10">
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground">
                     No recently viewed articles
