@@ -258,10 +258,7 @@ export default function Editor() {
           </div>
 
           {/* Action Bar */}
-          <div className="flex items-center justify-between pt-4 border-t">
-            <p className="text-sm text-muted-foreground">
-              Auto-saved at 3:42 PM
-            </p>
+          <div className="flex items-center justify-end pt-4 border-t">
             <div className="flex items-center space-x-2">
               <Button variant="outline">Cancel</Button>
               <Button

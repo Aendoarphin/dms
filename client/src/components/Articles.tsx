@@ -36,13 +36,22 @@ import useArticles from "@/hooks/useArticles";
 import useGetAdmin from "@/hooks/useGetAdmin";
 import supabase from "@/util/supabase";
 import Loader from "./Loader";
+import {
+  articleCategories,
+  sortOptions,
+  timeFilters,
+} from "@/static";
 
 export default function Articles() {
   const [categoryValue, setCategoryValue] = useState("all");
   const [sortValue, setSortValue] = useState("newest");
   const [timeFilterValue, setTimeFilterValue] = useState("all-time");
   const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || "")
+    JSON.parse(
+      localStorage.getItem(
+        `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
+      ) || ""
+    )
   );
   const [loading, setLoading] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -77,7 +86,7 @@ export default function Articles() {
         // Time filter
         const publishDate = new Date(article.publish_date);
         const today = new Date();
-        const lastWeek = new Date(
+        const lastWeek: Date = new Date(
           today.getFullYear(),
           today.getMonth(),
           today.getDate() - 7
@@ -205,47 +214,18 @@ export default function Articles() {
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="lg:hidden">
+                  <Button variant={"ghost"} size="icon">
                     <Filter className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setCategoryValue("all")}>
-                    All Articles
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setCategoryValue("accounting")}
-                  >
-                    Accounting
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setCategoryValue("compliance")}
-                  >
-                    Compliance
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setCategoryValue("operations")}
-                  >
-                    Operations
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setCategoryValue("information technology")}
-                  >
-                    Information Technology
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setCategoryValue("collections")}
-                  >
-                    Collections
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setCategoryValue("human resources")}
-                  >
-                    Human Resources
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setCategoryValue("other")}>
-                    Other
-                  </DropdownMenuItem>
+                  {articleCategories.map((category) => (
+                    <DropdownMenuItem
+                      onClick={() => setCategoryValue(category.value)}
+                    >
+                      {category.label}
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -254,102 +234,20 @@ export default function Articles() {
           {/* Filter Bar */}
           <div className="flex flex-col p-4 space-y-4 rounded-lg sm:flex-row sm:items-center sm:justify-between sm:space-y-0 bg-card">
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant={categoryValue === "all" ? "default" : "outline"}
+              {articleCategories.map(a => (
+                <Button
+                key={a.value}
+                variant={categoryValue === a.value ? "default" : "outline"}
                 size="sm"
                 className="h-8"
-                onClick={() => setCategoryValue("all")}
+                onClick={() => setCategoryValue(a.value)}
               >
-                All
+                {a.label}
                 <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("all")}
+                  {getCategoryCount(a.value)}
                 </Badge>
               </Button>
-              <Button
-                variant={categoryValue === "accounting" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("accounting")}
-              >
-                Accounting
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("accounting")}
-                </Badge>
-              </Button>
-              <Button
-                variant={categoryValue === "compliance" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("compliance")}
-              >
-                Compliance
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("compliance")}
-                </Badge>
-              </Button>
-              <Button
-                variant={categoryValue === "operations" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("operations")}
-              >
-                Operations
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("operations")}
-                </Badge>
-              </Button>
-              <Button
-                variant={
-                  categoryValue === "information technology"
-                    ? "default"
-                    : "outline"
-                }
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("information technology")}
-              >
-                Information Technology
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("information technology")}
-                </Badge>
-              </Button>
-              <Button
-                variant={
-                  categoryValue === "collections" ? "default" : "outline"
-                }
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("collections")}
-              >
-                Collections
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("collections")}
-                </Badge>
-              </Button>
-              <Button
-                variant={
-                  categoryValue === "human resources" ? "default" : "outline"
-                }
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("human resources")}
-              >
-                Human Resources
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("human resources")}
-                </Badge>
-              </Button>
-              <Button
-                variant={categoryValue === "other" ? "default" : "outline"}
-                size="sm"
-                className="h-8"
-                onClick={() => setCategoryValue("other")}
-              >
-                Other
-                <Badge variant="secondary" className="ml-2">
-                  {getCategoryCount("other")}
-                </Badge>
-              </Button>
+              ))}
             </div>
             <div className="flex items-center space-x-2">
               <Select defaultValue="newest" onValueChange={setSortValue}>
@@ -357,10 +255,11 @@ export default function Articles() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="oldest">Oldest First</SelectItem>
-                  <SelectItem value="title">Title A-Z</SelectItem>
-                  <SelectItem value="author">Author A-Z</SelectItem>
+                  {sortOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Select
@@ -371,10 +270,11 @@ export default function Articles() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all-time">All Time</SelectItem>
-                  <SelectItem value="last-week">Last Week</SelectItem>
-                  <SelectItem value="last-month">Last Month</SelectItem>
-                  <SelectItem value="last-quarter">Last Quarter</SelectItem>
+                  {timeFilters.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
