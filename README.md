@@ -37,7 +37,7 @@ create table public.articles (
 ### 3. Row Level Security (RLS)
 In the Table Editor, enable RLS for both created tables:
 
-![RLS Enable](image.png)
+![RLS Enable](image-rls.png)
 
 #### Create RLS Policies
 Policies must be created for the SDK to perform any successful database operations.
@@ -51,7 +51,7 @@ Adjust policies based on your requirements.
 ### 4. User Management
 In Authentication > Users, click 'Add user' to create the admin user:
 
-![Add User](image-7.png)
+![Add User](image-create-user.png)
 
 In the SQL Editor or Table Editor, copy the UID of the newly created user, and insert a record in public.administrators table; the 'user_id' column should containt the copied UID.
 
