@@ -2,12 +2,18 @@ import supabase from "@/util/supabase";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
+// Event listener to update session status
 export default function useListenAuth(signedInTime: string) {
   const navigate = useNavigate();
   const [lastActivityTime, setLastActivityTime] = useState(signedInTime);
 
   useEffect(() => {
     const checkSessionExpiration = async () => {
+      console.log(
+        localStorage.getItem(
+          `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
+        )
+      );
       try {
         const response = await fetch(import.meta.env.VITE_DEV_SERVER_URL);
         const currentTime = new Date().getTime();
@@ -17,11 +23,15 @@ export default function useListenAuth(signedInTime: string) {
         if (
           // User was inactive beyond session time
           timeDiff > import.meta.env.VITE_SESSION_DURATION_IN_MINUTES &&
-          localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) &&
+          localStorage.getItem(
+            `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
+          ) &&
           response.ok
         ) {
           supabase.auth.signOut();
-          localStorage.removeItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`);
+          localStorage.removeItem(
+            `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
+          );
           window.alert(
             "Your session has expired due to inactivity. Please log in again."
           );
@@ -33,13 +43,17 @@ export default function useListenAuth(signedInTime: string) {
           setLastActivityTime(new Date().toISOString());
         }
       } catch (error) {
-        window.location.reload();
         console.error("Error checking session expiration:", error);
       }
     };
 
     const handleDocumentClick = () => {
-      checkSessionExpiration();
+      if (
+        localStorage.getItem(
+          `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
+        )
+      )
+        checkSessionExpiration();
     };
 
     document.addEventListener("click", handleDocumentClick);

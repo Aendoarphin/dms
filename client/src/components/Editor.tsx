@@ -36,6 +36,14 @@ export default function Editor() {
   const [category, setCategory] = useState("operations");
   const [isPublishing, setIsPublishing] = useState(false);
 
+  function clearInputs() {
+    setTitle("");
+    setDescription("");
+    setContent("");
+    setTags([]);
+    setCategory("operations");
+  }
+
   const handlePublish = async () => {
     try {
       const fetchResponse = await fetch(import.meta.env.VITE_DEV_SERVER_URL);
@@ -57,12 +65,11 @@ export default function Editor() {
           return;
         } else {
           console.log("Article published successfully!");
-          toast.success("Article published successfully!", toasterStyle.success);
-          setTitle("");
-          setDescription("");
-          setContent("");
-          setTags([]);
-          setCategory("operations");
+          toast.success(
+            "Article published successfully!",
+            toasterStyle.success
+          );
+          clearInputs();
         }
       } else {
         toast.error("Could not connect to server", toasterStyle.error);
@@ -203,9 +210,7 @@ export default function Editor() {
                         <SelectItem value="human resources">
                           Human Resources
                         </SelectItem>
-                        <SelectItem value="other">
-                          Other
-                        </SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -260,7 +265,9 @@ export default function Editor() {
           {/* Action Bar */}
           <div className="flex items-center justify-end pt-4 border-t">
             <div className="flex items-center space-x-2">
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" onClick={clearInputs}>
+                Clear
+              </Button>
               <Button
                 variant="outline"
                 size="sm"

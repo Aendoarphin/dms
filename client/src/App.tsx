@@ -80,12 +80,12 @@ function App() {
               <Route index element={<Home />} />
               <Route path="articles" element={<Articles />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="files" element={<Files />} />
               {/* admin check */}
               {adminId === session.user.id && (
                 <>
                   <Route path="users" element={<Users />} />
                   <Route path="editor" element={<Editor />} />
-                  <Route path="files" element={<Files />} />
                 </>
               )}
               <Route path="users/new" element={<AddUserForm />} />

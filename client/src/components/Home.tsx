@@ -27,7 +27,11 @@ export default function Home() {
   const [refresh] = useState(false);
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
   const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || "")
+    JSON.parse(
+      localStorage.getItem(
+        `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
+      ) || ""
+    )
   );
 
   const articles = useArticles(refresh);

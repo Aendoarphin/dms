@@ -76,7 +76,7 @@ export default function AddUserForm() {
         });
       }
 
-      // Set user metadata
+      // Set user metadata (For first, last, and email_verified)
       if (createUserRes.status === 201 && createUserRes.data.user) {
         const setUserMetadataRes = await axios.put(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/user/${createUserRes.data.user.id}`,

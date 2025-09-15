@@ -9,22 +9,14 @@ import { useSanitizeHtml } from "@/hooks/useSanitizeHtml";
 export default function ArticlePreview() {
   const [searchParams] = useSearchParams();
 
-  const previewData = {
+  // Placeholder article data
+  const article = {
+    id: 1,
     title: searchParams.get("t") || "",
     description: searchParams.get("e") || "",
     category: searchParams.get("c") || "",
     author: searchParams.get("a") || "",
-    tags: searchParams.get("tags") || "",
-  };
-
-  // Placeholder article data
-  const article = {
-    id: 1,
-    title: previewData.title,
-    description: previewData.description,
-    category: previewData.category,
-    author: previewData.author,
-    tags: JSON.parse(decodeURIComponent(previewData.tags)),
+    tags: JSON.parse(decodeURIComponent(searchParams.get("tags") || "",)),
     content: useSanitizeHtml(localStorage.getItem("previewContent") || ""),
   };
 

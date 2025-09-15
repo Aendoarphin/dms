@@ -5,7 +5,7 @@ interface Admin {
   id: string;
   user_id: string;
 }
-
+// Gets a list of all admins
 export const useAdmins = () => {
   const [admins, setAdmins] = useState<Admin[] | null>([]);
   const [loading, setLoading] = useState(true);

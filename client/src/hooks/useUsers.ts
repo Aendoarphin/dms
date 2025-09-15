@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import type { User } from "@supabase/supabase-js";
 
+// Gets a list of users
 export const useUsers = (refresh: boolean) => {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);

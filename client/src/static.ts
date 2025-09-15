@@ -79,6 +79,14 @@ export const articleCategories = [
 	},
 ];
 
+// File sort options
+export const fileSortItems = [
+  { value: "newest", label: "Newest First" },
+  { value: "oldest", label: "Oldest First" },
+  { value: "name", label: "Name A-Z" },
+  { value: "size", label: "Size (Large)" }
+];
+
 // Article sort options
 export const sortOptions = [
 	{ value: "newest", label: "Newest First" },

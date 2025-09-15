@@ -8,6 +8,10 @@ import { Eye, EyeOff, KeyRound } from "lucide-react";
 import { useNavigate } from "react-router";
 import { passwordMinLength, passwordPattern, passwordTitle } from "@/global";
 
+// NOT IMPLEMENTED
+// GUIDE FOR EMAIL PASSWORD RECOVERY HERE:
+// https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail
+
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

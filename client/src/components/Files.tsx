@@ -44,10 +44,11 @@ import {
 import { useState, useEffect } from "react";
 import { formatFileSize, formatDate } from "@/util/helper";
 import { toast, Toaster } from "sonner";
-import { toasterStyle } from "@/static";
+import { fileSortItems, toasterStyle } from "@/static";
 import supabase from "@/util/supabase";
 import Loader from "./Loader";
 import NoContent from "./NoContent";
+import useGetAdmin from "@/hooks/useGetAdmin";
 
 interface FileItem {
   id: string;
@@ -66,6 +67,13 @@ export default function Files() {
   const [refresh, setRefresh] = useState(false);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
+  const admin = useGetAdmin(
+    JSON.parse(
+      localStorage.getItem(
+        `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
+      )!
+    )
+  );
 
   // Fetch files when component mounts or refresh changes
   useEffect(() => {
@@ -93,7 +101,7 @@ export default function Files() {
     };
 
     fetchFiles();
-  }, [refresh]); // Re-run when refresh changes
+  }, [refresh]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -367,10 +375,11 @@ export default function Files() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="oldest">Oldest First</SelectItem>
-                  <SelectItem value="name">Name A-Z</SelectItem>
-                  <SelectItem value="size">Size (Large)</SelectItem>
+                  {fileSortItems.map((f, index) => (
+                    <SelectItem key={index} value={f.value}>
+                      {f.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -447,38 +456,49 @@ export default function Files() {
                             >
                               <Download strokeWidth={3} />
                             </Button>
-                            {/* Delete Dialog */}
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="link"
-                                  size="sm"
-                                  className="p-2 text-destructive hover:text-destructive"
-                                  title="Delete File"
-                                >
-                                  <Trash strokeWidth={3} />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Confirm File Delete</DialogTitle>
-                                  <DialogDescription>
-                                    Do you wish to delete the file "{file.name}
-                                    "? This action cannot be undone.
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="flex justify-end space-x-2">
-                                  <Button variant="outline">Cancel</Button>
-                                  <Button
-                                    variant="destructive"
-                                    onClick={() => handleDeleteFile(file.id)}
-                                    disabled={loading}
-                                  >
-                                    {loading ? "Deleting..." : "Delete File"}
-                                  </Button>
-                                </div>
-                              </DialogContent>
-                            </Dialog>
+                            {admin ? (
+                              <>
+                                {/* Delete Dialog */}
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="link"
+                                      size="sm"
+                                      className="p-2 text-destructive hover:text-destructive"
+                                      title="Delete File"
+                                    >
+                                      <Trash strokeWidth={3} />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>
+                                        Confirm File Delete
+                                      </DialogTitle>
+                                      <DialogDescription>
+                                        Do you wish to delete the file "
+                                        {file.name}
+                                        "? This action cannot be undone.
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="flex justify-end space-x-2">
+                                      <Button variant="outline">Cancel</Button>
+                                      <Button
+                                        variant="destructive"
+                                        onClick={() =>
+                                          handleDeleteFile(file.id)
+                                        }
+                                        disabled={loading}
+                                      >
+                                        {loading
+                                          ? "Deleting..."
+                                          : "Delete File"}
+                                      </Button>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              </>
+                            ) : null}
                           </TableCell>
                         </TableRow>
                       )
