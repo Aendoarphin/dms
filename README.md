@@ -40,25 +40,20 @@ In the Table Editor, enable RLS for both created tables:
 ![RLS Enable](image.png)
 
 #### Create RLS Policies
-In the same area, click 'Add RLS policy' and create table policies:
+Policies must be created for the SDK to perform any successful database operations.
 
-**public.administrators**
+In the same area, click 'Add RLS policy' and create table policies for both tables.
 
-![Administrator Policy](image-2.png)
+For my project I enabled 'ALL' access with the target role of 'authenticated'.
 
-**public.articles**
-
-![Article Policy 1](image-3.png)
-![Article Policy 2](image-4.png)
-![Article Policy 3](image-5.png)
-![Article Policy 4](image-6.png)
+Adjust roles based on your requirements.
 
 ### 4. User Management
 In Authentication > Users, click 'Add user' to create the admin user:
 
 ![Add User](image-7.png)
 
-Copy the UID of the newly created user, and insert a record in public.administrators table via SQL Editor or Table Editor.
+In the SQL Editor or Table Editor, copy the UID of the newly created user, and insert a record in public.administrators table; the 'user_id' column should containt the copied UID.
 
 ### 5. Enable Data API
 In Project Settings > Data API, enable 'Enable data API'
