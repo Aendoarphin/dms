@@ -5,6 +5,4 @@ VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 VITE_SUPABASE_PROJECT_ID=<your-project-id>
 VITE_DEV_SERVER_URL=http://localhost:5173
 VITE_COMPANY_NAME=<name-of-company>
-
-# Time in minutes
-VITE_SESSION_DURATION=60
+VITE_SESSION_DURATION_IN_MINUTES=60
