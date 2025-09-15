@@ -46,7 +46,7 @@ In the same area, click 'Add RLS policy' and create table policies for both tabl
 
 For my project I enabled 'ALL' access with the target role of 'authenticated'.
 
-Adjust roles based on your requirements.
+Adjust policies based on your requirements.
 
 ### 4. User Management
 In Authentication > Users, click 'Add user' to create the admin user:
