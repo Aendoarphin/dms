@@ -1,3 +1,5 @@
+# Place your .env in the client folder
+
 VITE_SUPABASE_URL=https://<your-project-id>.supabase.co
 VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 VITE_SUPABASE_PROJECT_ID=<your-project-id>
