@@ -2,6 +2,17 @@
 
 A straightforward internal knowledge base app for organizing and sharing information. Built with React and Supabase, it supports user authentication, article management, search, and tagging, with room for growth and future integrations. The whole idea is to create a very accessible source of job aids for all departments of a company.
 
+# Stack Summary
+Frontend
+- Vite + React with shadcn components
+- Tailwind and CSS for custom styling
+- React router for routing
+
+Backend
+- Supabase for database, authentication, edge functions, and file storage
+
+# Contributing
+
 ## Supabase Setup
 
 ### 1. Create Project
@@ -148,6 +159,17 @@ app.delete('/user', async (req, res)=>{
 app.listen(8000, ()=>{
   console.log("Listening on port: 8000");
 });
-
 ```
-Copy the following Express code into an edge function:
+## Project Setup
+### 1. Clone the project and install dependencies
+```
+  git clone https://github.com/Aendoarphin/dms && cd client && npm install
+```
+### 2. Create the project .env file and place it inside the 'client folder'
+Copy the contents of 'env-template.txt' file into the new .env file; fill in the environment variables according to your Supabase project setup.
+### 3. Run the development server to test out the project
+```
+  npm run dev
+``` 
+
+Report any issues to arhon.k.pineda@gmail.com
