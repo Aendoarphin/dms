@@ -44,7 +44,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar className="**:overflow-x-hidden w-40 overflow-hidden">
+    <Sidebar className="**:overflow-x-hidden w-40 overflow-x-hidden">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-nowrap flex items-center gap-2 flex-row">
