@@ -2,6 +2,17 @@
 
 A straightforward internal knowledge base app for organizing and sharing information. Built with React and Supabase, it supports user authentication, article management, search, and tagging, with room for growth and future integrations. The whole idea is to create a very accessible source of job aids for all departments of a company.
 
+# Stack Summary
+Frontend
+- Vite + React with shadcn components
+- Tailwind and CSS for custom styling
+- React router for routing
+
+Backend
+- Supabase for database, authentication, edge functions, and file storage
+
+# Contributing
+
 ## Supabase Setup
 
 ### 1. Create Project
@@ -37,7 +48,7 @@ create table public.articles (
 ### 3. Row Level Security (RLS)
 In the Table Editor, enable RLS for both created tables:
 
-![RLS Enable](image.png)
+![RLS Enable](image-rls.png)
 
 #### Create RLS Policies
 Policies must be created for the SDK to perform any successful database operations.
@@ -51,7 +62,7 @@ Adjust policies based on your requirements.
 ### 4. User Management
 In Authentication > Users, click 'Add user' to create the admin user:
 
-![Add User](image-7.png)
+![Add User](image-create-user.png)
 
 In the SQL Editor or Table Editor, copy the UID of the newly created user, and insert a record in public.administrators table; the 'user_id' column should containt the copied UID.
 
@@ -148,6 +159,17 @@ app.delete('/user', async (req, res)=>{
 app.listen(8000, ()=>{
   console.log("Listening on port: 8000");
 });
-
 ```
-Copy the following Express code into an edge function:
+## Project Setup
+### 1. Clone the project and install dependencies
+```
+  git clone https://github.com/Aendoarphin/dms && cd client && npm install
+```
+### 2. Create the project .env file and place it inside the 'client folder'
+Copy the contents of 'env-template.txt' file into the new .env file; fill in the environment variables according to your Supabase project setup.
+### 3. Run the development server to test out the project
+```
+  npm run dev
+``` 
+
+Report any issues to arhon.k.pineda@gmail.com

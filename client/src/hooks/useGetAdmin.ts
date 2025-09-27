@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import supabase from "@/util/supabase";
 
+// Gets ID of current admin
 export default function useGetAdmin(currentUser: { user: { id: string } }) {
 	const [adminId, setAdminId] = useState<string | null>(null);
 

@@ -11,7 +11,7 @@ export interface Article {
   tags: string[];
   content: string;
 }
-
+// Gets a list of all articles
 export default function useArticles(refresh: boolean) {
   const [articles, setArticles] = useState<
     Article[] | null
