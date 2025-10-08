@@ -1,46 +1,10 @@
-import {
-  Search,
-  FileIcon,
-  Calendar,
-  HardDrive,
-  File,
-  Trash,
-  Download,
-  Upload,
-  FileText,
-} from "lucide-react";
+import { Search, FileIcon, Calendar, HardDrive, File, Trash, Download, Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { formatFileSize, formatDate } from "@/util/helper";
 import { toast, Toaster } from "sonner";
@@ -67,13 +31,8 @@ export default function Files() {
   const [refresh, setRefresh] = useState(false);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
-  const admin = useGetAdmin(
-    JSON.parse(
-      localStorage.getItem(
-        `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
-      )!
-    )
-  );
+  const admin = useGetAdmin(JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`)!));
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
   // Fetch files when component mounts or refresh changes
   useEffect(() => {
@@ -121,16 +80,11 @@ export default function Files() {
     setUploadLoading(true);
     try {
       // Store the file in storage
-      const { error } = await supabase.storage
-        .from("documents")
-        .upload(selectedFile.name, selectedFile);
+      const { error } = await supabase.storage.from("documents").upload(selectedFile.name, selectedFile);
 
       if (error) {
         console.error("Error uploading file:", error.message);
-        toast.error(
-          error.message || "Failed to upload file",
-          toasterStyle.error
-        );
+        toast.error(error.message || "Failed to upload file", toasterStyle.error);
         return;
       }
 
@@ -138,15 +92,10 @@ export default function Files() {
       setUploadDialogOpen(false);
 
       // Reset file input
-      const fileInput = document.getElementById(
-        "file-upload"
-      ) as HTMLInputElement;
+      const fileInput = document.getElementById("file-upload") as HTMLInputElement;
       if (fileInput) fileInput.value = "";
 
-      toast.success(
-        `File "${selectedFile.name}" uploaded successfully!`,
-        toasterStyle.success
-      );
+      toast.success(`File "${selectedFile.name}" uploaded successfully!`, toasterStyle.success);
 
       // Trigger re-render by toggling refresh state
       setRefresh(!refresh);
@@ -162,18 +111,14 @@ export default function Files() {
     setSelectedFile(null);
     setUploadDialogOpen(false);
     // Reset file input
-    const fileInput = document.getElementById(
-      "file-upload"
-    ) as HTMLInputElement;
+    const fileInput = document.getElementById("file-upload") as HTMLInputElement;
     if (fileInput) fileInput.value = "";
   };
 
   const handleDeleteFile = async (fileId: string) => {
     setLoading(true);
     try {
-      const { error } = await supabase.storage
-        .from("documents")
-        .remove([fileId]);
+      const { error } = await supabase.storage.from("documents").remove([fileId]);
 
       if (error) {
         console.error("Error deleting file:", error);
@@ -194,9 +139,7 @@ export default function Files() {
 
   const handleDownloadFile = async (fileId: string, fileName: string) => {
     try {
-      const { data, error } = await supabase.storage
-        .from("documents")
-        .download(fileId);
+      const { data, error } = await supabase.storage.from("documents").download(fileId);
 
       if (error) {
         console.error("Error downloading file:", error);
@@ -223,9 +166,7 @@ export default function Files() {
 
   // Filter files based on search and category
   const filteredFiles = files.filter((file) => {
-    const matchesSearch = file.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesSearch = file.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -271,26 +212,15 @@ export default function Files() {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <h1 className="text-2xl font-bold">Files</h1>
-              <p className="text-muted-foreground">
-                Manage all files in the system
-              </p>
+              <p className="text-muted-foreground">Manage all files in the system</p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search files..."
-                  className="w-full lg:w-[300px] pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                <Input type="search" placeholder="Search files..." className="w-full lg:w-[300px] pl-8" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
               </div>
               {/* Upload Dialog */}
-              <Dialog
-                open={uploadDialogOpen}
-                onOpenChange={setUploadDialogOpen}
-              >
+              <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
                 <DialogTrigger asChild>
                   <Button>
                     <Upload className="h-4 w-4 mr-2" />
@@ -300,10 +230,7 @@ export default function Files() {
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle>Upload File</DialogTitle>
-                    <DialogDescription>
-                      Select a file to upload. Supported formats: PDF, DOC,
-                      DOCX, TXT, CSV, XLS, XLSX
-                    </DialogDescription>
+                    <DialogDescription>Select a file to upload. Supported formats: PDF, DOC, DOCX, TXT, CSV, XLS, XLSX</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     {/* File Drop Zone */}
@@ -315,21 +242,11 @@ export default function Files() {
                         <div className="flex flex-col items-center justify-center pt-5 pb-6">
                           <Upload className="w-8 h-8 mb-2 text-gray-400" />
                           <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                            <span className="font-semibold">
-                              Click to upload
-                            </span>
+                            <span className="font-semibold">Click to upload</span>
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Maximum file size: 50MB
-                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Maximum file size: 50MB</p>
                         </div>
-                        <Input
-                          id="file-upload"
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx"
-                          onChange={handleFileSelect}
-                        />
+                        <Input id="file-upload" type="file" className="hidden" accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx" onChange={handleFileSelect} />
                       </label>
                     </div>
                     {/* Selected File Preview */}
@@ -337,12 +254,8 @@ export default function Files() {
                       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
                         <div className="flex items-center space-x-2">
                           <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                            {selectedFile.name}
-                          </span>
-                          <span className="text-xs text-blue-600 dark:text-blue-400">
-                            ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                          </span>
+                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">{selectedFile.name}</span>
+                          <span className="text-xs text-blue-600 dark:text-blue-400">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
                         </div>
                       </div>
                     )}
@@ -352,10 +265,7 @@ export default function Files() {
                     <Button variant="outline" onClick={handleCancelUpload}>
                       Cancel
                     </Button>
-                    <Button
-                      onClick={handleFileUpload}
-                      disabled={!selectedFile || uploadLoading}
-                    >
+                    <Button onClick={handleFileUpload} disabled={!selectedFile || uploadLoading}>
                       {uploadLoading ? "Uploading..." : "Upload File"}
                     </Button>
                   </div>
@@ -367,10 +277,7 @@ export default function Files() {
           {/* Filter Bar */}
           <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-end sm:space-y-0 p-4 bg-card rounded-lg">
             <div className="flex items-center space-x-2">
-              <Select
-                defaultValue="name"
-                onValueChange={(value: string) => setSortValue(value)}
-              >
+              <Select defaultValue="name" onValueChange={(value: string) => setSortValue(value)}>
                 <SelectTrigger className="w-[140px] h-8">
                   <SelectValue />
                 </SelectTrigger>
@@ -387,11 +294,7 @@ export default function Files() {
 
           {/* Results Summary */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">
-              {filesLoading
-                ? "Loading files..."
-                : `Showing ${filteredFiles.length - 1} files`}
-            </p>
+            <p className="text-sm text-muted-foreground">{filesLoading ? "Loading files..." : `Showing ${filteredFiles.length - 1} files`}</p>
           </div>
 
           {/* Files Table */}
@@ -401,9 +304,7 @@ export default function Files() {
                 <FileIcon className="h-5 w-5" />
                 <CardTitle>File Library</CardTitle>
               </div>
-              <CardDescription>
-                Complete list of all uploaded files
-              </CardDescription>
+              <CardDescription>Complete list of all uploaded files</CardDescription>
             </CardHeader>
             <CardContent>
               {
@@ -435,69 +336,38 @@ export default function Files() {
                     {filteredFiles.map((file) =>
                       file.name.includes("emptyFolder") ? null : (
                         <TableRow key={file.id} className="hover:bg-muted">
-                          <TableCell className="font-medium">
-                            {file.name}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {formatFileSize(file.size)}
-                          </TableCell>
-                          <TableCell className="text-muted-foreground">
-                            {formatDate(file.created)}
-                          </TableCell>
+                          <TableCell className="font-medium">{file.name}</TableCell>
+                          <TableCell className="text-muted-foreground">{formatFileSize(file.size)}</TableCell>
+                          <TableCell className="text-muted-foreground">{formatDate(file.created)}</TableCell>
                           <TableCell className="flex justify-center space-x-1">
-                            <Button
-                              variant="link"
-                              size="sm"
-                              onClick={() =>
-                                handleDownloadFile(file.id, file.name)
-                              }
-                              className="p-2"
-                              title="Download File"
-                            >
+                            <Button variant="link" size="sm" onClick={() => handleDownloadFile(file.id, file.name)} className="p-2" title="Download File">
                               <Download strokeWidth={3} />
                             </Button>
                             {admin ? (
-                              <>
-                                {/* Delete Dialog */}
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      variant="link"
-                                      size="sm"
-                                      className="p-2 text-destructive hover:text-destructive"
-                                      title="Delete File"
-                                    >
-                                      <Trash strokeWidth={3} />
+                              <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
+                                <DialogTrigger asChild>
+                                  <Button variant="link" size="sm" className="p-2 text-destructive hover:text-destructive" title="Delete File">
+                                    <Trash strokeWidth={3} />
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>Confirm File Delete</DialogTitle>
+                                    <DialogDescription>
+                                      Do you wish to delete the file "{file.name}
+                                      "? This action cannot be undone.
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  <div className="flex justify-end space-x-2">
+                                    <Button variant="outline" onClick={() => setDialogIsOpen(false)}>
+                                      Cancel
                                     </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle>
-                                        Confirm File Delete
-                                      </DialogTitle>
-                                      <DialogDescription>
-                                        Do you wish to delete the file "
-                                        {file.name}
-                                        "? This action cannot be undone.
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="flex justify-end space-x-2">
-                                      <Button variant="outline">Cancel</Button>
-                                      <Button
-                                        variant="destructive"
-                                        onClick={() =>
-                                          handleDeleteFile(file.id)
-                                        }
-                                        disabled={loading}
-                                      >
-                                        {loading
-                                          ? "Deleting..."
-                                          : "Delete File"}
-                                      </Button>
-                                    </div>
-                                  </DialogContent>
-                                </Dialog>
-                              </>
+                                    <Button variant="destructive" onClick={() => handleDeleteFile(file.id)} disabled={loading}>
+                                      {loading ? "Deleting..." : "Delete File"}
+                                    </Button>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
                             ) : null}
                           </TableCell>
                         </TableRow>
@@ -506,10 +376,7 @@ export default function Files() {
                   </TableBody>
                 </Table>
               }
-              {filteredFiles.length === 1 &&
-              filteredFiles[0]?.name.includes("emptyFolder") ? (
-                <NoContent />
-              ) : null}
+              {filteredFiles.length === 1 && filteredFiles[0]?.name.includes("emptyFolder") ? <NoContent /> : null}
             </CardContent>
           </Card>
         </div>
