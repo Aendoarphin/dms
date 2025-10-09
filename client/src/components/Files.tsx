@@ -40,7 +40,6 @@ export default function Files() {
       setFilesLoading(true);
       try {
         const allDocs = await supabase.storage.from("documents").list();
-        console.log(allDocs.data);
 
         if (allDocs.data) {
           const allFiles: FileItem[] = allDocs.data.map((file) => ({

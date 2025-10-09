@@ -31,7 +31,7 @@ export function Login() {
       (document.getElementById("email") as HTMLInputElement).value = "";
       (document.getElementById("password") as HTMLInputElement).value = "";
     } else {
-      navigate("/");
+      navigate("/", { replace: true });
     }
   };
 

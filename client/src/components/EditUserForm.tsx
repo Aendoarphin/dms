@@ -127,6 +127,13 @@ export default function EditUserForm() {
         toast.success("User updated successfully", {
           ...toasterStyle.success,
         });
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          role: "",
+          password: "",
+        });
         await new Promise((resolve) => setTimeout(resolve, 3000));
         navigate("/users");
       }
@@ -170,11 +177,29 @@ export default function EditUserForm() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" name="firstName" type="text" placeholder="Enter first name" value={formData.firstName} onChange={handleInputChange} />
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      placeholder="Enter first name"
+                      title="Name must be at least 2 characters long and contain only letters, spaces, hyphens, and apostrophes"
+                      pattern="^[A-Za-z][A-Za-z\s'\-]{1,}$"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" name="lastName" type="text" placeholder="Enter last name" value={formData.lastName} onChange={handleInputChange} />
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      placeholder="Enter last name"
+                      title="Name must be at least 2 characters long and contain only letters, spaces, hyphens, and apostrophes"
+                      pattern="^[A-Za-z][A-Za-z\s'\-]{1,}$"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                    />
                   </div>
                 </div>
 

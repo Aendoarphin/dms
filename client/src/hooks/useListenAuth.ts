@@ -9,11 +9,6 @@ export default function useListenAuth(signedInTime: string) {
 
   useEffect(() => {
     const checkSessionExpiration = async () => {
-      console.log(
-        localStorage.getItem(
-          `sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`
-        )
-      );
       try {
         const response = await fetch(import.meta.env.VITE_DEV_SERVER_URL);
         const currentTime = new Date().getTime();
