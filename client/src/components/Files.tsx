@@ -7,12 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { formatFileSize, formatDate } from "@/util/helper";
-import { toast, Toaster } from "sonner";
 import { fileSortItems, toasterStyle } from "@/static";
 import supabase from "@/util/supabase";
 import Loader from "./Loader";
 import NoContent from "./NoContent";
 import useGetAdmin from "@/hooks/useGetAdmin";
+import { toast, Toaster } from "sonner";
 
 interface FileItem {
   id: string;
@@ -31,8 +31,9 @@ export default function Files() {
   const [refresh, setRefresh] = useState(false);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
+  const [deleteDialogFileId, setDeleteDialogFileId] = useState<string | null>(null);
+  
   const admin = useGetAdmin(JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`)!));
-  const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
   // Fetch files when component mounts or refresh changes
   useEffect(() => {
@@ -245,7 +246,7 @@ export default function Files() {
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Maximum file size: 50MB</p>
                         </div>
-                        <Input id="file-upload" type="file" className="hidden" accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx" onChange={handleFileSelect} />
+                        <Input id="file-upload" multiple type="file" className="hidden" accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx" onChange={handleFileSelect} />
                       </label>
                     </div>
                     {/* Selected File Preview */}
@@ -343,7 +344,7 @@ export default function Files() {
                               <Download strokeWidth={3} />
                             </Button>
                             {admin ? (
-                              <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
+                              <Dialog open={deleteDialogFileId === file.id} onOpenChange={(open) => setDeleteDialogFileId(open ? file.id : null)}>
                                 <DialogTrigger asChild>
                                   <Button variant="link" size="sm" className="p-2 text-destructive hover:text-destructive" title="Delete File">
                                     <Trash strokeWidth={3} />
@@ -352,13 +353,10 @@ export default function Files() {
                                 <DialogContent>
                                   <DialogHeader>
                                     <DialogTitle>Confirm File Delete</DialogTitle>
-                                    <DialogDescription>
-                                      Do you wish to delete the file "{file.name}
-                                      "? This action cannot be undone.
-                                    </DialogDescription>
+                                    <DialogDescription>Do you wish to delete the file "{file.name}"? This action cannot be undone.</DialogDescription>
                                   </DialogHeader>
                                   <div className="flex justify-end space-x-2">
-                                    <Button variant="outline" onClick={() => setDialogIsOpen(false)}>
+                                    <Button variant="outline" onClick={() => setDeleteDialogFileId(null)}>
                                       Cancel
                                     </Button>
                                     <Button variant="destructive" onClick={() => handleDeleteFile(file.id)} disabled={loading}>
