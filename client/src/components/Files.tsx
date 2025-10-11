@@ -6,13 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
-import { formatFileSize, formatDate } from "@/util/helper";
+import { formatFileSize, formatDate, fileIsTooBig } from "@/util/helper";
 import { fileSortItems, toasterStyle } from "@/static";
 import supabase from "@/util/supabase";
 import Loader from "./Loader";
 import NoContent from "./NoContent";
 import useGetAdmin from "@/hooks/useGetAdmin";
 import { toast, Toaster } from "sonner";
+import { Label } from "./ui/label";
 
 interface FileItem {
   id: string;
@@ -26,13 +27,14 @@ export default function Files() {
   const [uploadLoading, setUploadLoading] = useState(false);
   const [sortValue, setSortValue] = useState("name");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
   const [deleteDialogFileId, setDeleteDialogFileId] = useState<string | null>(null);
-  
+  // const [fileSet, setFileSet] = useState<File[]>([])
+
   const admin = useGetAdmin(JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`)!));
 
   // Fetch files when component mounts or refresh changes
@@ -63,42 +65,70 @@ export default function Files() {
   }, [refresh]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Check file size (50MB limit)
-      if (file.size > 50 * 1024 * 1024) {
-        toast.error("File size must be less than 50MB", toasterStyle.error);
+    const files = event.target.files;
+
+    // Check if any of the files exceed file size limit
+    if (files && fileIsTooBig(files)) {
+      toast.error("File size must be less than 50MB", toasterStyle.error);
+      return;
+    }
+
+    // continue here; finish implementing batch file upload
+
+    if (files) {
+      if (files.length === 1) {
+        const selected: File[] = [];
+        selected.push(files[0]);
+        setSelectedFiles(selected);
+        console.log(selected[0]);
+        return;
+      } else if (files.length > 1) {
+        const selected: File[] = [];
+        for (let i = 0; i < files.length; i++) {
+          selected.push(files[i]);
+        }
+        setSelectedFiles(selected);
+        console.log(selected);
         return;
       }
-      setSelectedFile(file);
     }
   };
 
   const handleFileUpload = async () => {
-    if (!selectedFile) return;
-
     setUploadLoading(true);
+
+    if (selectedFiles?.length === 0) return;
+
     try {
-      // Store the file in storage
-      const { error } = await supabase.storage.from("documents").upload(selectedFile.name, selectedFile);
+      if (selectedFiles?.length === 1) {
+        // Store the file in storage
+        const { error } = await supabase.storage.from("documents").upload(selectedFiles[0].name, selectedFiles[0]);
 
-      if (error) {
-        console.error("Error uploading file:", error.message);
-        toast.error(error.message || "Failed to upload file", toasterStyle.error);
-        return;
+        if (error) {
+          console.error("Error uploading file:", error.message);
+          toast.error(error.message || "Failed to upload file", toasterStyle.error);
+          return;
+        }
+
+        setSelectedFiles([]);
+        setUploadDialogOpen(false);
+
+        // Reset file input
+        const fileInput = document.getElementById("file-upload") as HTMLInputElement;
+        if (fileInput) fileInput.value = "";
+
+        toast.success(`File "${selectedFiles[0].name}" uploaded successfully!`, toasterStyle.success);
+
+        // Trigger re-render by toggling refresh state
+        setRefresh(!refresh);
+      } else if (selectedFiles!.length > 1) {
+        selectedFiles!.forEach(async (file) => {
+          const { error } = await supabase.storage.from("documents").upload(file.name, file);
+          if (error) return;
+        });
+        // Trigger re-render by toggling refresh state
+        setRefresh(!refresh);
       }
-
-      setSelectedFile(null);
-      setUploadDialogOpen(false);
-
-      // Reset file input
-      const fileInput = document.getElementById("file-upload") as HTMLInputElement;
-      if (fileInput) fileInput.value = "";
-
-      toast.success(`File "${selectedFile.name}" uploaded successfully!`, toasterStyle.success);
-
-      // Trigger re-render by toggling refresh state
-      setRefresh(!refresh);
     } catch (error) {
       console.error("Error uploading file:", error);
       toast.error("Server error. Please try again later.", toasterStyle.error);
@@ -108,7 +138,7 @@ export default function Files() {
   };
 
   const handleCancelUpload = () => {
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setUploadDialogOpen(false);
     // Reset file input
     const fileInput = document.getElementById("file-upload") as HTMLInputElement;
@@ -224,7 +254,7 @@ export default function Files() {
                 <DialogTrigger asChild>
                   <Button>
                     <Upload className="h-4 w-4 mr-2" />
-                    Upload File
+                    Upload
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
@@ -234,8 +264,8 @@ export default function Files() {
                   </DialogHeader>
                   <div className="space-y-4">
                     {/* File Drop Zone */}
-                    <div className="flex items-center justify-center w-full">
-                      <label
+                    <div className="flex items-center justify-center w-full" hidden={selectedFiles.length > 0}>
+                      <Label
                         htmlFor="file-upload"
                         className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
                       >
@@ -247,25 +277,37 @@ export default function Files() {
                           <p className="text-xs text-gray-500 dark:text-gray-400">Maximum file size: 50MB</p>
                         </div>
                         <Input id="file-upload" multiple type="file" className="hidden" accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx" onChange={handleFileSelect} />
-                      </label>
+                      </Label>
                     </div>
                     {/* Selected File Preview */}
-                    {selectedFile && (
+                    {selectedFiles.length === 1 ? (
                       <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
                         <div className="flex items-center space-x-2">
                           <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">{selectedFile.name}</span>
-                          <span className="text-xs text-blue-600 dark:text-blue-400">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">{selectedFiles[0].name}</span>
+                          <span className="text-xs text-blue-600 dark:text-blue-400">({(selectedFiles[0].size / 1024 / 1024).toFixed(2)} MB)</span>
                         </div>
                       </div>
-                    )}
+                    ) : selectedFiles.length > 1 ? (
+                      <div className="overflow-y-scroll max-h-60 *:mb-1">
+                        {selectedFiles.map((file, index) => (
+                          <div key={index} className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
+                            <div className="flex items-center space-x-2">
+                              <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                              <span className="text-sm font-medium text-blue-900 dark:text-blue-100">{file.name}</span>
+                              <span className="text-xs text-blue-600 dark:text-blue-400">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                   {/* Dialog Actions */}
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline" onClick={handleCancelUpload}>
                       Cancel
                     </Button>
-                    <Button onClick={handleFileUpload} disabled={!selectedFile || uploadLoading}>
+                    <Button onClick={handleFileUpload} disabled={!selectedFiles || uploadLoading}>
                       {uploadLoading ? "Uploading..." : "Upload File"}
                     </Button>
                   </div>
