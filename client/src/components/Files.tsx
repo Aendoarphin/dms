@@ -1,4 +1,4 @@
-import { Search, FileIcon, Calendar, HardDrive, File, Trash, Download, Upload, FileText } from "lucide-react";
+import { Search, FolderOpen, Calendar, HardDrive, File, Trash, Download, Upload, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,9 +33,28 @@ export default function Files() {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [filesLoading, setFilesLoading] = useState(true);
   const [deleteDialogFileId, setDeleteDialogFileId] = useState<string | null>(null);
-  // const [fileSet, setFileSet] = useState<File[]>([])
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-  const admin = useGetAdmin(JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`)!));
+  // Safely get admin status
+  const getAuthToken = () => {
+    try {
+      const token = localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`);
+      return token ? JSON.parse(token) : null;
+    } catch (error) {
+      console.error("Error parsing auth token:", error);
+      return null;
+    }
+  };
+
+  const admin = useGetAdmin(getAuthToken());
+
+  // Helper function to reset file input
+  const resetFileInput = () => {
+    const fileInput = document.getElementById("file-upload") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
 
   // Fetch files when component mounts or refresh changes
   useEffect(() => {
@@ -55,7 +74,7 @@ export default function Files() {
         }
       } catch (error) {
         console.error("Error fetching files:", error);
-        toast.error("Failed to fetch files");
+        toast.error("Failed to fetch files", toasterStyle.error);
       } finally {
         setFilesLoading(false);
       }
@@ -67,41 +86,33 @@ export default function Files() {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
 
-    // Check if any of the files exceed file size limit
-    if (files && fileIsTooBig(files)) {
-      toast.error("File size must be less than 50MB", toasterStyle.error);
+    if (!files || files.length === 0) {
       return;
     }
 
-    // continue here; finish implementing batch file upload
-
-    if (files) {
-      if (files.length === 1) {
-        const selected: File[] = [];
-        selected.push(files[0]);
-        setSelectedFiles(selected);
-        console.log(selected[0]);
-        return;
-      } else if (files.length > 1) {
-        const selected: File[] = [];
-        for (let i = 0; i < files.length; i++) {
-          selected.push(files[i]);
-        }
-        setSelectedFiles(selected);
-        console.log(selected);
-        return;
-      }
+    // Check if any of the files exceed file size limit
+    if (fileIsTooBig(Array.from(files))) {
+      toast.error("File size must be less than 50MB", toasterStyle.error);
+      resetFileInput();
+      return;
     }
+
+    // Convert FileList to array
+    const selected: File[] = Array.from(files);
+    setSelectedFiles(selected);
   };
 
   const handleFileUpload = async () => {
-    setUploadLoading(true);
+    if (selectedFiles.length === 0) {
+      return;
+    }
 
-    if (selectedFiles?.length === 0) return;
+    setUploadLoading(true);
+    setUploadProgress(0);
 
     try {
-      if (selectedFiles?.length === 1) {
-        // Store the file in storage
+      if (selectedFiles.length === 1) {
+        // Store single file in storage
         const { error } = await supabase.storage.from("documents").upload(selectedFiles[0].name, selectedFiles[0]);
 
         if (error) {
@@ -109,40 +120,60 @@ export default function Files() {
           toast.error(error.message || "Failed to upload file", toasterStyle.error);
           return;
         }
+        setUploadProgress(100);
+      } else {
+        // Upload multiple files with progress tracking
+        let completedUploads = 0;
+        const totalFiles = selectedFiles.length;
+        const errors = [];
 
-        setSelectedFiles([]);
-        setUploadDialogOpen(false);
+        for (const file of selectedFiles) {
+          try {
+            const { error } = await supabase.storage.from("documents").upload(file.name, file);
 
-        // Reset file input
-        const fileInput = document.getElementById("file-upload") as HTMLInputElement;
-        if (fileInput) fileInput.value = "";
+            if (error) {
+              errors.push({ file: file.name, error });
+            }
 
-        toast.success(`File "${selectedFiles[0].name}" uploaded successfully!`, toasterStyle.success);
+            completedUploads++;
+            const progress = Math.round((completedUploads / totalFiles) * 100);
+            setUploadProgress(progress);
+          } catch (err) {
+            errors.push({ file: file.name, error: err });
+            completedUploads++;
+            const progress = Math.round((completedUploads / totalFiles) * 100);
+            setUploadProgress(progress);
+          }
+        }
 
-        // Trigger re-render by toggling refresh state
-        setRefresh(!refresh);
-      } else if (selectedFiles!.length > 1) {
-        selectedFiles!.forEach(async (file) => {
-          const { error } = await supabase.storage.from("documents").upload(file.name, file);
-          if (error) return;
-        });
-        // Trigger re-render by toggling refresh state
-        setRefresh(!refresh);
+        if (errors.length > 0) {
+          toast.error(`Failed to upload ${errors.length} file(s)`, toasterStyle.error);
+          return;
+        }
       }
+
+      // Success - show toast and refresh
+      setTimeout(() => {
+        toast.success("File(s) uploaded successfully", toasterStyle.success);
+      }, 500);
+      setUploadDialogOpen(false);
+      setSelectedFiles([]);
+      setRefresh((prev) => !prev);
     } catch (error) {
       console.error("Error uploading file:", error);
       toast.error("Server error. Please try again later.", toasterStyle.error);
     } finally {
+      resetFileInput();
       setUploadLoading(false);
+      setUploadProgress(0);
     }
   };
 
   const handleCancelUpload = () => {
     setSelectedFiles([]);
     setUploadDialogOpen(false);
-    // Reset file input
-    const fileInput = document.getElementById("file-upload") as HTMLInputElement;
-    if (fileInput) fileInput.value = "";
+    setUploadProgress(0);
+    resetFileInput();
   };
 
   const handleDeleteFile = async (fileId: string) => {
@@ -156,13 +187,15 @@ export default function Files() {
         return;
       }
 
-      toast.success("File deleted successfully!");
-      // Trigger re-render by toggling refresh state
+      setTimeout(() => {
+        toast.success("File deleted successfully", toasterStyle.success);
+      }, 500);
       setRefresh((prev) => !prev);
     } catch (error) {
       console.error("Error deleting file:", error);
       toast.error("Failed to delete file", toasterStyle.error);
     } finally {
+      setDeleteDialogFileId(null);
       setLoading(false);
     }
   };
@@ -177,52 +210,49 @@ export default function Files() {
         return;
       }
 
-      // Create download link
+      // Create download link with proper cleanup
       const url = window.URL.createObjectURL(data);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      toast.info(`Downloading ${fileName}...`);
+      try {
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast.info(`Downloading ${fileName}...`);
+      } finally {
+        window.URL.revokeObjectURL(url);
+      }
     } catch (error) {
       console.error("Error downloading file:", error);
       toast.error("Failed to download file", toasterStyle.error);
     }
   };
 
-  // Filter files based on search and category
+  // Filter files based on search and exclude emptyFolder
   const filteredFiles = files.filter((file) => {
+    if (file.name.includes("emptyFolder")) {
+      return false;
+    }
     const matchesSearch = file.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
   // Sort files
-  switch (sortValue) {
-    case "newest":
-      filteredFiles.sort((a, b) => {
+  const sortedFiles = [...filteredFiles].sort((a, b) => {
+    switch (sortValue) {
+      case "newest":
         return new Date(b.created).getTime() - new Date(a.created).getTime();
-      });
-      break;
-    case "oldest":
-      filteredFiles.sort((a, b) => {
+      case "oldest":
         return new Date(a.created).getTime() - new Date(b.created).getTime();
-      });
-      break;
-    case "name":
-      filteredFiles.sort((a, b) => {
+      case "name":
         return a.name.localeCompare(b.name);
-      });
-      break;
-    case "size":
-      filteredFiles.sort((a, b) => {
+      case "size":
         return b.size - a.size;
-      });
-      break;
-  }
+      default:
+        return 0;
+    }
+  });
 
   if (filesLoading) {
     return (
@@ -280,34 +310,27 @@ export default function Files() {
                       </Label>
                     </div>
                     {/* Selected File Preview */}
-                    {selectedFiles.length === 1 ? (
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
-                        <div className="flex items-center space-x-2">
-                          <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          <span className="text-sm font-medium text-blue-900 dark:text-blue-100">{selectedFiles[0].name}</span>
-                          <span className="text-xs text-blue-600 dark:text-blue-400">({(selectedFiles[0].size / 1024 / 1024).toFixed(2)} MB)</span>
-                        </div>
-                      </div>
-                    ) : selectedFiles.length > 1 ? (
-                      <div className="overflow-y-scroll max-h-60 *:mb-1">
+                    {selectedFiles.length > 0 && (
+                      <div className="overflow-y-scroll max-h-60 space-y-1">
                         {selectedFiles.map((file, index) => (
                           <div key={index} className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
                             <div className="flex items-center space-x-2">
-                              <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                              <span className="text-sm font-medium text-blue-900 dark:text-blue-100">{file.name}</span>
-                              <span className="text-xs text-blue-600 dark:text-blue-400">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                              <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                              <span className="text-sm font-medium text-blue-900 dark:text-blue-100 truncate">{file.name}</span>
+                              <span className="text-xs text-blue-600 dark:text-blue-400 flex-shrink-0">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                             </div>
                           </div>
                         ))}
                       </div>
-                    ) : null}
+                    )}
                   </div>
                   {/* Dialog Actions */}
-                  <div className="flex justify-end space-x-2">
-                    <Button variant="outline" onClick={handleCancelUpload}>
+                  <div className="flex justify-end space-x-2 items-center">
+                    {uploadLoading && <div className="mr-auto text-sm text-muted-foreground">Progress: {uploadProgress}%</div>}
+                    <Button variant="outline" onClick={handleCancelUpload} disabled={uploadLoading}>
                       Cancel
                     </Button>
-                    <Button onClick={handleFileUpload} disabled={!selectedFiles || uploadLoading}>
+                    <Button onClick={handleFileUpload} disabled={selectedFiles.length === 0 || uploadLoading}>
                       {uploadLoading ? "Uploading..." : "Upload File"}
                     </Button>
                   </div>
@@ -336,20 +359,20 @@ export default function Files() {
 
           {/* Results Summary */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">{filesLoading ? "Loading files..." : `Showing ${filteredFiles.length - 1} files`}</p>
+            <p className="text-sm text-muted-foreground">{filesLoading ? "Loading files..." : `Showing ${sortedFiles.length} ${sortedFiles.length === 1 ? "file" : "files"}`}</p>
           </div>
 
           {/* Files Table */}
           <Card>
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <FileIcon className="h-5 w-5" />
+                <FolderOpen className="h-5 w-5" />
                 <CardTitle>File Library</CardTitle>
               </div>
               <CardDescription>Complete list of all uploaded files</CardDescription>
             </CardHeader>
             <CardContent>
-              {
+              {sortedFiles.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -375,47 +398,46 @@ export default function Files() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredFiles.map((file) =>
-                      file.name.includes("emptyFolder") ? null : (
-                        <TableRow key={file.id} className="hover:bg-muted">
-                          <TableCell className="font-medium">{file.name}</TableCell>
-                          <TableCell className="text-muted-foreground">{formatFileSize(file.size)}</TableCell>
-                          <TableCell className="text-muted-foreground">{formatDate(file.created)}</TableCell>
-                          <TableCell className="flex justify-center space-x-1">
-                            <Button variant="link" size="sm" onClick={() => handleDownloadFile(file.id, file.name)} className="p-2" title="Download File">
-                              <Download strokeWidth={3} />
-                            </Button>
-                            {admin ? (
-                              <Dialog open={deleteDialogFileId === file.id} onOpenChange={(open) => setDeleteDialogFileId(open ? file.id : null)}>
-                                <DialogTrigger asChild>
-                                  <Button variant="link" size="sm" className="p-2 text-destructive hover:text-destructive" title="Delete File">
-                                    <Trash strokeWidth={3} />
+                    {sortedFiles.map((file) => (
+                      <TableRow key={file.id} className="hover:bg-muted">
+                        <TableCell className="font-medium">{file.name}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatFileSize(file.size)}</TableCell>
+                        <TableCell className="text-muted-foreground">{formatDate(file.created)}</TableCell>
+                        <TableCell className="flex justify-center space-x-1">
+                          <Button variant="link" size="sm" onClick={() => handleDownloadFile(file.id, file.name)} className="p-2" title="Download File">
+                            <Download strokeWidth={3} />
+                          </Button>
+                          {admin && (
+                            <Dialog open={deleteDialogFileId === file.id} onOpenChange={(open) => setDeleteDialogFileId(open ? file.id : null)}>
+                              <DialogTrigger asChild>
+                                <Button variant="link" size="sm" className="p-2 text-destructive hover:text-destructive" title="Delete File">
+                                  <Trash strokeWidth={3} />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Confirm File Delete</DialogTitle>
+                                  <DialogDescription>Do you wish to delete the file "{file.name}"? This action cannot be undone.</DialogDescription>
+                                </DialogHeader>
+                                <div className="flex justify-end space-x-2">
+                                  <Button variant="outline" onClick={() => setDeleteDialogFileId(null)} disabled={loading}>
+                                    Cancel
                                   </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                  <DialogHeader>
-                                    <DialogTitle>Confirm File Delete</DialogTitle>
-                                    <DialogDescription>Do you wish to delete the file "{file.name}"? This action cannot be undone.</DialogDescription>
-                                  </DialogHeader>
-                                  <div className="flex justify-end space-x-2">
-                                    <Button variant="outline" onClick={() => setDeleteDialogFileId(null)}>
-                                      Cancel
-                                    </Button>
-                                    <Button variant="destructive" onClick={() => handleDeleteFile(file.id)} disabled={loading}>
-                                      {loading ? "Deleting..." : "Delete File"}
-                                    </Button>
-                                  </div>
-                                </DialogContent>
-                              </Dialog>
-                            ) : null}
-                          </TableCell>
-                        </TableRow>
-                      )
-                    )}
+                                  <Button variant="destructive" onClick={() => handleDeleteFile(file.id)} disabled={loading}>
+                                    {loading ? "Deleting..." : "Delete File"}
+                                  </Button>
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
-              }
-              {filteredFiles.length === 1 && filteredFiles[0]?.name.includes("emptyFolder") ? <NoContent /> : null}
+              ) : (
+                <NoContent />
+              )}
             </CardContent>
           </Card>
         </div>

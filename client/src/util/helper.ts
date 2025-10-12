@@ -27,7 +27,7 @@ export const formatDateTime = (dateString: string) => {
   });
 };
 
-export function fileIsTooBig(fileSet: FileList) {
+export function fileIsTooBig(fileSet: File[]) {
   const temp = [];
   for (let i = 0; i < fileSet.length; i++) {
     temp.push(fileSet[i])
