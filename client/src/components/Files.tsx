@@ -13,7 +13,7 @@ import Loader from "./Loader";
 import NoContent from "./NoContent";
 import useGetAdmin from "@/hooks/useGetAdmin";
 import { toast, Toaster } from "sonner";
-import { Label } from "./ui/label";
+import { Dropzone, DropzoneContent, DropzoneEmptyState } from "./ui/shadcn-io/dropzone";
 
 interface FileItem {
   id: string;
@@ -83,9 +83,7 @@ export default function Files() {
     fetchFiles();
   }, [refresh]);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-
+  const handleFileSelect = (files: File[]) => {
     if (!files || files.length === 0) {
       return;
     }
@@ -293,22 +291,12 @@ export default function Files() {
                     <DialogDescription>Select a file to upload. Supported formats: PDF, DOC, DOCX, TXT, CSV, XLS, XLSX</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
-                    {/* File Drop Zone */}
-                    <div className="flex items-center justify-center w-full" hidden={selectedFiles.length > 0}>
-                      <Label
-                        htmlFor="file-upload"
-                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"
-                      >
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                            <span className="font-semibold">Click to upload</span>
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Maximum file size: 50MB</p>
-                        </div>
-                        <Input id="file-upload" multiple type="file" className="hidden" accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx" onChange={handleFileSelect} />
-                      </Label>
-                    </div>
+                    {/* File Dropzone */}
+                    <Dropzone className="border border-dashed border-neutral-400" disabled={selectedFiles.length > 0} maxSize={1024 * 1024 * 10} maxFiles={5} minSize={1024} onDrop={handleFileSelect} onError={console.error} src={selectedFiles}>
+                      <DropzoneEmptyState />
+                      <DropzoneContent className="*:whitespace-break-spaces" />
+                    </Dropzone>
+
                     {/* Selected File Preview */}
                     {selectedFiles.length > 0 && (
                       <div className="overflow-y-scroll max-h-60 space-y-1">
