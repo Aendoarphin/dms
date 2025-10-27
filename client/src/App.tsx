@@ -2,18 +2,14 @@ import "@/App.css";
 import { Routes, Route, useNavigate } from "react-router";
 import supabase from "@/util/supabase";
 
-import Articles from "@/components/Articles";
+import ArticleList from "@/components/ArticleList";
 import Home from "@/components/Home";
 import Profile from "@/components/Profile";
 import Users from "@/components/Users";
 import Layout from "@/layout";
 import Login from "@/components/Login";
-
-import { useEffect, useState } from "react";
-import { type Session } from "@supabase/supabase-js";
 import NotFound from "@/components/NotFound";
 import Editor from "@/components/Editor";
-import useListenAuth from "@/hooks/useListenAuth";
 import AddUserForm from "@/components/AddUserForm";
 import EditUserForm from "@/components/EditUserForm";
 import ResetPassword from "@/components/ResetPassword";
@@ -21,8 +17,12 @@ import Article from "@/components/Article";
 import ArticlePreview from "@/components/ArticlePreview";
 import Files from "@/components/Files";
 
+import { useEffect, useState } from "react";
+import { type Session } from "@supabase/supabase-js";
+
 import { SessionContext } from "@/context";
 import useGetAdmin from "@/hooks/useGetAdmin";
+import useListenAuth from "@/hooks/useListenAuth";
 
 function App() {
   const navigate = useNavigate();
@@ -78,7 +78,7 @@ function App() {
           {session !== null && (
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
-              <Route path="articles" element={<Articles />} />
+              <Route path="articles" element={<ArticleList />} />
               <Route path="profile" element={<Profile />} />
               <Route path="files" element={<Files />} />
               {/* admin check */}

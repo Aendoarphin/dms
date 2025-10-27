@@ -18,7 +18,6 @@ export default function AddUserForm() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -44,7 +43,6 @@ export default function AddUserForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setLoading(true);
 
     const config = {
@@ -116,10 +114,6 @@ export default function AddUserForm() {
     }
   };
 
-  const handleBack = () => {
-    navigate("/users");
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <Toaster duration={5000} position="bottom-right" />
@@ -129,7 +123,7 @@ export default function AddUserForm() {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div>
               <div className="flex justify-between pt-4">
-                <Button variant="ghost" onClick={handleBack}>
+                <Button variant="ghost" onClick={() => navigate("/users")}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Users
                 </Button>
@@ -196,7 +190,7 @@ export default function AddUserForm() {
                 </div>
 
                 <div className="flex items-center justify-between pt-4">
-                  <Button type="button" variant="outline" onClick={handleBack}>
+                  <Button type="button" variant="outline" onClick={() => navigate("/users")}>
                     <ArrowLeft className="h-4 w-4" />
                     Cancel
                   </Button>

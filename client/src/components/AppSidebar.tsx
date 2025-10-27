@@ -1,21 +1,5 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import supabase from "@/util/supabase";
 import { useNavigate, Link } from "react-router";
 
@@ -27,20 +11,24 @@ import { menuItems } from "@/static";
 const adminItems = ["Users", "Editor"];
 
 export function AppSidebar() {
-  const [currentUser] = useState(
-    JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || "")
-  );
-  const [active, setActive] = useState(menuItems[0].title);
+  const [currentUser] = useState(JSON.parse(localStorage.getItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`) || ""));
+  const [active, setActive] = useState(localStorage.getItem("active-sidebar-item") || menuItems[0].title);
   const [companyName] = useState(import.meta.env.VITE_COMPANY_NAME);
-
   const navigate = useNavigate();
   const adminId = useGetAdmin(currentUser);
 
   const handleLogout = async () => {
     await supabase.auth.signOut({ scope: "global" });
     localStorage.removeItem(`sb-${import.meta.env.VITE_SUPABASE_PROJECT_ID}-auth-token`);
+    localStorage.removeItem("active-sidebar-item");
     sessionStorage.clear();
     navigate("/login", { replace: true });
+  };
+
+  const handleSidebarItemClick = (itemTitle: string) => {
+    if (itemTitle.toLowerCase() === "logout") return;
+    localStorage.setItem("active-sidebar-item", itemTitle);
+    setActive(itemTitle);
   };
 
   return (
@@ -48,29 +36,17 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-nowrap flex items-center gap-2 flex-row">
-            <img src="/companylogo.svg" className="max-w-4" alt="Logo" />{" "}
-            <p>{companyName}</p>
+            <img src="/companylogo.svg" className="max-w-4" alt="Logo" /> <p>{companyName}</p>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => {
-                if (
-                  adminItems.includes(item.title) &&
-                  currentUser.user.id !== adminId
-                ) {
+                if (adminItems.includes(item.title) && currentUser.user.id !== adminId) {
                   return null;
                 }
 
                 return (
-                  <SidebarMenuItem
-                    className={
-                      item.title === active && item.title !== "Logout"
-                        ? " border-l-2 border-primary md:w-96"
-                        : ""
-                    }
-                    key={item.title}
-                    onClick={() => setActive(item.title)}
-                  >
+                  <SidebarMenuItem className={item.title === active && item.title !== "Logout" ? " border-l-2 border-primary md:w-96" : ""} key={item.title} onClick={() => handleSidebarItemClick(item.title)}>
                     <SidebarMenuButton className="rounded-none" asChild>
                       {item.title === "Logout" ? (
                         <Dialog modal>
@@ -83,25 +59,15 @@ export function AppSidebar() {
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Confirm Logout</DialogTitle>
-                              <DialogDescription>
-                                Do you wish to log out? Any unsaved changes will
-                                be lost.
-                              </DialogDescription>
+                              <DialogDescription>Do you wish to log out? Any unsaved changes will be lost.</DialogDescription>
                             </DialogHeader>
-                            <Button
-                              variant="destructive"
-                              onClick={handleLogout}
-                              type="button"
-                            >
+                            <Button variant="destructive" onClick={handleLogout} type="button">
                               Logout
                             </Button>
                           </DialogContent>
                         </Dialog>
                       ) : (
-                        <Link
-                          to={item.url}
-                          className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md"
-                        >
+                        <Link to={item.url} className="flex items-center gap-2 w-full py-2 px-3 hover:bg-muted rounded-md">
                           <item.icon size={16} />
                           <span>{item.title}</span>
                         </Link>
